@@ -29,7 +29,7 @@ public class ProdottoController {
 
     @CrossOrigin
     @GetMapping(value = "/getProdottoByCodice/{codice}")
-    private ResponseEntity getProdottoByIdProdotto(@PathVariable String codice) {
+    private ResponseEntity getProdottoByCodice(@PathVariable String codice) {
         try {
             Prodotto prodotto = prodottoService.getProdottoByCodice(codice);
             return ResponseEntity.status(HttpStatus.OK).header("Prodotto Trovato", "--- OK --- Prodotto Trovato Con Successo").body(prodotto);
@@ -51,12 +51,12 @@ public class ProdottoController {
 
     @CrossOrigin
     @PutMapping(value = "/updateProdotto/{codice}")
-    private ResponseEntity updateProdotto (@RequestBody Prodotto nuovoProdotto, @PathVariable String idProdotto) {
+    private ResponseEntity updateProdotto (@RequestBody Prodotto nuovoProdotto, @PathVariable String codice) {
         try {
             if (nuovoProdotto.getCodiceProdotto() != null) {
                 nuovoProdotto.setCodiceProdotto(null);
             }
-            prodottoService.updateProdotto(nuovoProdotto, idProdotto);
+            prodottoService.updateProdotto(nuovoProdotto, codice);
             return ResponseEntity.status(HttpStatus.OK).header("Aggiornamento Prodotto", "--- OK --- Prodotto Aggiornato Con Successo").body(getAllProdotti().getBody());
         } catch (Exception e) {
             throw e;
