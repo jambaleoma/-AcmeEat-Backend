@@ -15,7 +15,7 @@ public class Ordinazione {
 
     @Id
     @GeneratedValue( strategy = GenerationStrategy.UNIQUE)
-    private String codice;
+    private String codiceOrdinazione;
 
     @Field
     private String indirizzo;

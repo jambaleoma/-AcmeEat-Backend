@@ -15,7 +15,7 @@ public class Citta {
 
     @Id
     @GeneratedValue( strategy = GenerationStrategy.UNIQUE)
-    private String codice;
+    private String codiceCitta;
 
     @Field
     private String nome;

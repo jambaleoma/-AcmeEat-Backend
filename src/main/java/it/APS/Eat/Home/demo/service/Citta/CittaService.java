@@ -1,9 +1,8 @@
-package it.APS.Eat.Home.demo.service;
+package it.APS.Eat.Home.demo.service.Citta;
 
 import it.APS.Eat.Home.demo.model.Citta;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface CittaService {
 

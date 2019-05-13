@@ -15,7 +15,7 @@ public class Ristorante {
 
     @Id
     @GeneratedValue( strategy = GenerationStrategy.UNIQUE)
-    private String codice;
+    private String codiceRistorante;
 
     @Field
     private String nome;
@@ -27,18 +27,18 @@ public class Ristorante {
     private Integer posizione;
 
     @Field
-    private Menu menu;
+    private String codiceCitta;
 
     @Field
-    private Cucina cucina;
+    private String codiceDirettore;
 
     @Field
-    private Direttore direttore;
+    private String codiceMenu;
 
     @Field
-    private Citta citta;
+    private String codiceCucina;
 
     @Field
-    private List<Ordinazione> oridinazioni;
+    private List<String> codiciOridinazioni;
 
 }

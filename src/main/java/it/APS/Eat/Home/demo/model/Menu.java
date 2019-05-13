@@ -15,12 +15,9 @@ public class Menu {
 
     @Id
     @GeneratedValue( strategy = GenerationStrategy.UNIQUE)
-    private String codice;
+    private String codiceMenu;
 
     @Field
-    private Ristorante ristorante;
-
-    @Field
-    private List<Prodotto> prodotti;
+    private List<String> codiciProdotti;
 
 }

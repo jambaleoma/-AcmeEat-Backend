@@ -13,7 +13,7 @@ public class RigaOrdinazione {
 
     @Id
     @GeneratedValue( strategy = GenerationStrategy.UNIQUE)
-    private String codice;
+    private String codiceRigaOrdinazione;
 
     @Field
     private String nota;

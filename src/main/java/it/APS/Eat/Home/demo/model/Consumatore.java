@@ -15,6 +15,9 @@ public class Consumatore {
 
     @Id
     @GeneratedValue( strategy = GenerationStrategy.UNIQUE)
+    private String codiceConsumatore;
+
+    @Field
     private String email;
 
     @Field

@@ -15,7 +15,7 @@ public class Direttore {
 
     @Id
     @GeneratedValue( strategy = GenerationStrategy.UNIQUE)
-    private String codice;
+    private String codiceDirettore;
 
     @Field
     private String psw;

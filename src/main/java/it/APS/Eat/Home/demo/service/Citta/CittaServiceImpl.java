@@ -1,4 +1,4 @@
-package it.APS.Eat.Home.demo.service;
+package it.APS.Eat.Home.demo.service.Citta;
 
 import it.APS.Eat.Home.demo.Exception.NotFoundException;
 import it.APS.Eat.Home.demo.model.Citta;
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component("CittaService")
-public class CittaServiceImpl implements CittaService{
+public class CittaServiceImpl implements CittaService {
 
     @Autowired
     private CittaRepository cittaRepository;
@@ -24,13 +24,13 @@ public class CittaServiceImpl implements CittaService{
     }
 
     @Override
-    public Citta getCittaByCodice(String codice) {
-        return cittaRepository.findById(codice).orElse(null);
+    public Citta aggiungiCitta(Citta citta) {
+        return cittaRepository.save(citta);
     }
 
     @Override
-    public Citta aggiungiCitta(Citta citta) {
-        return cittaRepository.save(citta);
+    public Citta getCittaByCodice(String codice) {
+        return cittaRepository.findById(codice).orElse(null);
     }
 
     @Override

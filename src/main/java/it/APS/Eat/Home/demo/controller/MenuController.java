@@ -1,0 +1,104 @@
+package it.APS.Eat.Home.demo.controller;
+
+import it.APS.Eat.Home.demo.model.Menu;
+import it.APS.Eat.Home.demo.model.Prodotto;
+import it.APS.Eat.Home.demo.service.Menu.MenuService;
+import it.APS.Eat.Home.demo.service.Prodotto.ProdottoService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/rest/menu")
+public class MenuController {
+
+    @Autowired
+    private MenuService menuService;
+
+    @Autowired
+    private ProdottoService prodottoService;
+
+    @CrossOrigin
+    @GetMapping(value = "/all")
+    private ResponseEntity getAllMenu() {
+        try {
+            List<Menu> menu = this.menuService.getAllMenu();
+            return ResponseEntity.status(HttpStatus.OK).header("Lista Menu", "--- OK --- Lista Menu Trovata Con Successo").body(menu);
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    @CrossOrigin
+    @GetMapping(value = "/getMenuByCodice/{codice}")
+    private ResponseEntity getMenuByCodice(@PathVariable String codice) {
+        try {
+            Menu menu = menuService.getMenuByCodice(codice);
+            return ResponseEntity.status(HttpStatus.OK).header("Menu Trovato", "--- OK --- Menu Trovato Con Successo").body(menu);
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    @CrossOrigin
+    @PostMapping(value = "/insertMenu")
+    public ResponseEntity aggiungiMenu(@RequestBody Menu d) {
+        try {
+            menuService.aggiungiMenu(d);
+            return ResponseEntity.status(HttpStatus.OK).header("Inserimento Menu", "--- OK --- Menu Inserito Con Successo").body(getAllMenu().getBody());
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    @CrossOrigin
+    @PutMapping(value = "/insertProductToMenu/{codiceMenu}")
+    public ResponseEntity aggiungiProdottoNelMenu(@PathVariable String codiceMenu, @RequestBody String codiceProdottoDaInserire) {
+        try {
+            Menu menu = menuService.aggiungiProdottoNelMenu(codiceMenu, codiceProdottoDaInserire);
+            return ResponseEntity.status(HttpStatus.OK).header("Inserimento Prodotto: " + codiceProdottoDaInserire + " nel Menu " + codiceMenu, "--- OK --- Prodotto Inserito Con Successo").body(menu);
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    @CrossOrigin
+    @DeleteMapping(value = "/deleteProductToMenu/{codiceMenu}")
+    public ResponseEntity eliminaProdottoNelMenu(@PathVariable String codiceMenu, @RequestBody String codiceProdottoDaEliminare) {
+        try {
+            Menu menu = menuService.eliminaProdottoNelMenu(codiceMenu, codiceProdottoDaEliminare);
+            return ResponseEntity.status(HttpStatus.OK).header("Eliminazione Prodotto: " + codiceProdottoDaEliminare + " nel Menu " + codiceMenu, "--- OK --- Prodotto Eliminato Con Successo").body(menu);
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    @CrossOrigin
+    @PutMapping(value = "/updateMenu/{codice}")
+    private ResponseEntity updateMenu (@RequestBody Menu nuovoMenu, @PathVariable String codice) {
+        try {
+            if (nuovoMenu.getCodiceMenu() != null) {
+                nuovoMenu.setCodiceMenu(null);
+            }
+            menuService.updateMenu(nuovoMenu, codice);
+            return ResponseEntity.status(HttpStatus.OK).header("Aggiornamento Menu", "--- OK --- Menu Aggiornato Con Successo").body(getAllMenu().getBody());
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    @CrossOrigin
+    @DeleteMapping(value = "/deleteMenuByCodice/{codice}")
+    private ResponseEntity deleteMenuByCodice(@PathVariable String codice) {
+        try {
+            menuService.deleteMenuByCodice(codice);
+            return ResponseEntity.status(HttpStatus.OK).header("Eliminazione Menu", "--- OK --- Menu Eliminato Con Successo").body("Il Menu con codice: " + codice + " è stata Eliminato con Successo");
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+}

@@ -13,7 +13,7 @@ public class Cucina {
 
     @Id
     @GeneratedValue( strategy = GenerationStrategy.UNIQUE)
-    private String codice;
+    private String codiceCucina;
 
     @Field
     private String username;

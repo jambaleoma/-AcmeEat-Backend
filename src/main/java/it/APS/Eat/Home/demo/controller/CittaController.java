@@ -1,14 +1,13 @@
 package it.APS.Eat.Home.demo.controller;
 
 import it.APS.Eat.Home.demo.model.Citta;
-import it.APS.Eat.Home.demo.service.CittaService;
+import it.APS.Eat.Home.demo.service.Citta.CittaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/rest/citta")
@@ -32,7 +31,7 @@ public class CittaController {
     @GetMapping(value = "/getCittaByCodice/{codice}")
     private ResponseEntity getCittaByCodice(@PathVariable String codice) {
         try {
-            Citta citta = this.cittaService.getCittaByCodice(codice);
+            Citta citta = cittaService.getCittaByCodice(codice);
             return ResponseEntity.status(HttpStatus.OK).header("Citta Trovata", "--- OK --- Citta Trovata Con Successo").body(citta);
         } catch (Exception e) {
             throw e;
@@ -43,8 +42,8 @@ public class CittaController {
     @PostMapping(value = "/insertCitta")
     public ResponseEntity aggiungiCitta(@RequestBody Citta c) {
         try {
-            Citta cittaAggiunta = this.cittaService.aggiungiCitta(c);
-            return ResponseEntity.status(HttpStatus.OK).header("Inserimento Città", "--- OK --- Città Inserita Con Successo").body(cittaAggiunta);
+            cittaService.aggiungiCitta(c);
+            return ResponseEntity.status(HttpStatus.OK).header("Inserimento Città", "--- OK --- Città Inserita Con Successo").body(getAllCitta().getBody());
         } catch (Exception e) {
             throw e;
         }
@@ -54,10 +53,10 @@ public class CittaController {
     @PutMapping(value = "/updateCitta/{codice}")
     private ResponseEntity updateCitta (@RequestBody Citta nuovaCitta, @PathVariable String codice) {
         try {
-            if (nuovaCitta.getCodice() != null) {
-                nuovaCitta.setCodice(null);
+            if (nuovaCitta.getCodiceCitta() != null) {
+                nuovaCitta.setCodiceCitta(null);
             }
-            Citta cittaAggiornata = cittaService.updateCitta(nuovaCitta, codice);
+            cittaService.updateCitta(nuovaCitta, codice);
             return ResponseEntity.status(HttpStatus.OK).header("Aggiornamento Citta", "--- OK --- Citta Aggiornata Con Successo").body(getAllCitta().getBody());
         } catch (Exception e) {
             throw e;
@@ -69,7 +68,7 @@ public class CittaController {
     private ResponseEntity deleteCittaByCodice(@PathVariable String codice) {
         try {
             cittaService.deleteCittaByCodice(codice);
-            return ResponseEntity.status(HttpStatus.OK).header("Eliminazione Citta", "--- OK --- Citta Eliminata Con Successo").body("La Citta con codice: " + codice + " è stato Eliminata con Successo");
+            return ResponseEntity.status(HttpStatus.OK).header("Eliminazione Citta", "--- OK --- Citta Eliminata Con Successo").body("La Citta con codice: " + codice + " è stata Eliminata con Successo");
         } catch (Exception e) {
             throw e;
         }
