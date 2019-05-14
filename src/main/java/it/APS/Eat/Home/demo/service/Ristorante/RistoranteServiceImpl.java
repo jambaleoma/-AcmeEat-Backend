@@ -38,6 +38,16 @@ public class RistoranteServiceImpl implements RistoranteService{
 
     @Override
     public Ristorante aggiungiRistorante(Ristorante ristorante) {
+//        List<Ristorante> ristoranti = this.getAllRistoranti();
+//        Integer posizione = 0;
+//        if (ristoranti != null ) {
+//            for (Ristorante r : ristoranti) {
+//                if (r.getPosizione() > posizione) {
+//                    posizione = r.getPosizione();
+//                }
+//            }
+//        }
+//        ristorante.setPosizione(posizione + 1);
         return ristoranteRepository.save(ristorante);
     }
 
@@ -128,6 +138,12 @@ public class RistoranteServiceImpl implements RistoranteService{
     @Override
     public Ristorante deleteRistoranteByCodice(String codice) {
         Ristorante r = this.getRistoranteByCodice(codice);
+        Integer posizioneRistorante = r.getPosizione();
+        for (Ristorante ristorante : this.getAllRistoranti()) {
+            if (ristorante.getPosizione() > posizioneRistorante) {
+
+            }
+        }
         this.ristoranteRepository.delete(r);
         return r;
     }

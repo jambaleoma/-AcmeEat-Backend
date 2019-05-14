@@ -2,6 +2,7 @@ package it.APS.Eat.Home.demo.service.Menu;
 
 import it.APS.Eat.Home.demo.Exception.NotFoundException;
 import it.APS.Eat.Home.demo.model.Menu;
+import it.APS.Eat.Home.demo.model.Prodotto;
 import it.APS.Eat.Home.demo.repository.MenuRepository;
 import it.APS.Eat.Home.demo.repository.ProdottoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +55,22 @@ public class MenuServiceImpl implements MenuService{
         } else {
             throw new NotFoundException("Il Prodotto non Esiste");
         }
+    }
+
+    @Override
+    public Menu selezionaProdottoSpecialeDelMenu(String codiceMenu, String codiceProdottoSpeciale) {
+        if (this.prodottoRepository.existsById(codiceProdottoSpeciale)) {
+            if (this.menuRepository.existsById(codiceMenu)) {
+                Menu menu = this.getMenuByCodice(codiceMenu);
+                for (String cp : menu.getCodiciProdotti()) {
+                    Prodotto p = this.prodottoRepository.findById(cp).orElse(null);
+                    p.setSpecialita(false);
+                }
+            }
+            Prodotto prodottoSpeciale = this.prodottoRepository.findById(codiceProdottoSpeciale).orElse(null);
+            prodottoSpeciale.setSpecialita(true);
+        }
+        return null;
     }
 
     @Override
