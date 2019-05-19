@@ -1,6 +1,7 @@
 package it.APS.Eat.Home.demo.service.Citta;
 
 import it.APS.Eat.Home.demo.model.Citta;
+import it.APS.Eat.Home.demo.model.Ristorante;
 
 import java.util.List;
 
@@ -11,5 +12,6 @@ public interface CittaService {
     Citta getCittaByCodice(String codice);
     Citta updateCitta(Citta nuovaCitta, String codice);
     Citta deleteCittaByCodice(String codice);
+    Citta confermaInserimentoRistorante(String codiceRistorante);
 
 }

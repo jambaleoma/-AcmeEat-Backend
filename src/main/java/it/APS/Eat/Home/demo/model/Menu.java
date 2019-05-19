@@ -18,6 +18,12 @@ public class Menu {
     private String codiceMenu;
 
     @Field
+    private String specialita;
+
+    @Field
     private List<String> codiciProdotti;
+
+    @Field
+    private Boolean isListaProdottiCompleta;
 
 }

@@ -42,7 +42,6 @@ import java.util.List;
             p.setNome(nuovoProdotto.getNome());
             p.setDescrizione(nuovoProdotto.getDescrizione());
             p.setPrezzo(nuovoProdotto.getPrezzo());
-            p.setSpecialita(nuovoProdotto.getSpecialita());
             this.prodottoRepository.getCouchbaseOperations().update(p);
             return p;
         } else {

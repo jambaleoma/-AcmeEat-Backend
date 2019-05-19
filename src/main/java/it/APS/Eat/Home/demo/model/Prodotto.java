@@ -25,7 +25,4 @@ public class Prodotto {
     @Field
     private String prezzo;
 
-    @Field
-    private Boolean specialita;
-
 }

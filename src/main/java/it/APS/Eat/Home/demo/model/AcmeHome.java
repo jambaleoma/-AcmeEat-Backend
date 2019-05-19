@@ -11,31 +11,15 @@ import java.util.List;
 
 @Data
 @Document
-public class Ristorante {
+public class AcmeHome {
 
     @Id
     @GeneratedValue( strategy = GenerationStrategy.UNIQUE)
-    private String codiceRistorante;
+    private String codiceAzienda;
 
     @Field
-    private String nome;
+    private List<Citta> citta;
 
     @Field
-    private String descrizione;
-
-    @Field
-    private String codiceCitta;
-
-    @Field
-    private String codiceDirettore;
-
-    @Field
-    private String codiceMenu;
-
-    @Field
-    private String codiceCucina;
-
-    @Field
-    private List<String> codiciOridinazioni;
-
+    private List<Ristorante> quindiciRistorantiRecenti;
 }

@@ -2,11 +2,14 @@ package it.APS.Eat.Home.demo.service.Ristorante;
 
 import com.sun.xml.internal.bind.v2.TODO;
 import it.APS.Eat.Home.demo.Exception.NotFoundException;
+import it.APS.Eat.Home.demo.model.Citta;
+import it.APS.Eat.Home.demo.model.Menu;
 import it.APS.Eat.Home.demo.model.Ristorante;
 import it.APS.Eat.Home.demo.repository.CittaRepository;
 import it.APS.Eat.Home.demo.repository.DirettoreRepository;
 import it.APS.Eat.Home.demo.repository.MenuRepository;
 import it.APS.Eat.Home.demo.repository.RistoranteRepository;
+import it.APS.Eat.Home.demo.service.Menu.MenuServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -20,6 +23,9 @@ public class RistoranteServiceImpl implements RistoranteService{
 
     @Autowired
     private MenuRepository menuRepository;
+
+    @Autowired
+    private MenuServiceImpl menuService;
 
     @Autowired
     private CittaRepository cittaRepository;
@@ -38,17 +44,11 @@ public class RistoranteServiceImpl implements RistoranteService{
 
     @Override
     public Ristorante aggiungiRistorante(Ristorante ristorante) {
-//        List<Ristorante> ristoranti = this.getAllRistoranti();
-//        Integer posizione = 0;
-//        if (ristoranti != null ) {
-//            for (Ristorante r : ristoranti) {
-//                if (r.getPosizione() > posizione) {
-//                    posizione = r.getPosizione();
-//                }
-//            }
-//        }
-//        ristorante.setPosizione(posizione + 1);
-        return ristoranteRepository.save(ristorante);
+        ristoranteRepository.save(ristorante);
+        Menu m = new Menu();
+        this.menuService.aggiungiMenu(m);
+        this.aggiungiMenuDelRistorante(ristorante.getCodiceRistorante(), m.getCodiceMenu());
+        return ristorante;
     }
 
     @Override
@@ -99,17 +99,17 @@ public class RistoranteServiceImpl implements RistoranteService{
         }
     }
 
-    @Override
-    public Ristorante aggiungiCucinaDelRistorante(String codiceRistorante, String codiceCucina) {
-        //TODO: Creare repository per Cucina:
-        return null;
-    }
+//    @Override
+//    public Ristorante aggiungiCucinaDelRistorante(String codiceRistorante, String codiceCucina) {
+//        //TODO: Creare repository per Cucina:
+//        return null;
+//    }
 
-    @Override
-    public Ristorante aggiungiOrdinazioneDelRistorante(String codiceRistorante, String codiceOrdinazione) {
-        //TODO: Creare repository per Ordinazione:
-        return null;
-    }
+//    @Override
+//    public Ristorante aggiungiOrdinazioneDelRistorante(String codiceRistorante, String codiceOrdinazione) {
+//        //TODO: Creare repository per Ordinazione:
+//        return null;
+//    }
 
     @Override
     public Ristorante getRistoranteByCodice(String codice) {
@@ -122,7 +122,6 @@ public class RistoranteServiceImpl implements RistoranteService{
             Ristorante r = this.getRistoranteByCodice(codice);
             r.setNome(nuovoRistorante.getNome());
             r.setDescrizione(nuovoRistorante.getDescrizione());
-            r.setPosizione(nuovoRistorante.getPosizione());
             r.setCodiceCitta(nuovoRistorante.getCodiceCitta());
             r.setCodiceMenu(nuovoRistorante.getCodiceMenu());
             r.setCodiceCucina(nuovoRistorante.getCodiceCucina());
@@ -138,13 +137,36 @@ public class RistoranteServiceImpl implements RistoranteService{
     @Override
     public Ristorante deleteRistoranteByCodice(String codice) {
         Ristorante r = this.getRistoranteByCodice(codice);
-        Integer posizioneRistorante = r.getPosizione();
-        for (Ristorante ristorante : this.getAllRistoranti()) {
-            if (ristorante.getPosizione() > posizioneRistorante) {
-
-            }
-        }
+        //TODO: Logica eliminazione ristorante in posizione < 15:
+//        Integer posizioneRistorante = r.getPosizione();
+//        for (Ristorante ristorante : this.getAllRistoranti()) {
+//            if (ristorante.getPosizione() > posizioneRistorante) {
+//
+//            }
+//        }
         this.ristoranteRepository.delete(r);
         return r;
+    }
+
+    @Override
+    public List<Citta> inserisciNuovoRistorante() {
+        return  (List<Citta>) this.cittaRepository.findAll();
+    }
+
+    @Override
+    public Ristorante terminaInserimento(String codice) {
+        if (this.ristoranteRepository.existsById(codice)) {
+            Ristorante r = this.getRistoranteByCodice(codice);
+            if (this.menuRepository.existsById(r.getCodiceMenu())) {
+                Menu m = this.menuService.getMenuByCodice(r.getCodiceMenu());
+                m.setIsListaProdottiCompleta(true);
+                this.menuService.updateMenu(m, r.getCodiceMenu());
+                return r;
+            } else {
+                throw new NotFoundException("Il Menu non Esiste");
+            }
+        } else {
+            throw new NotFoundException("Il Ristorante non Esiste");
+        }
     }
 }

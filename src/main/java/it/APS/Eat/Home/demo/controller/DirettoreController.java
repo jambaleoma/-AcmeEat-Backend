@@ -1,6 +1,11 @@
 package it.APS.Eat.Home.demo.controller;
 
+import it.APS.Eat.Home.demo.model.AcmeHome;
+import it.APS.Eat.Home.demo.model.Citta;
 import it.APS.Eat.Home.demo.model.Direttore;
+import it.APS.Eat.Home.demo.model.Ristorante;
+import it.APS.Eat.Home.demo.service.AcmeHome.AcmeHomeService;
+import it.APS.Eat.Home.demo.service.Citta.CittaService;
 import it.APS.Eat.Home.demo.service.Direttore.DirettoreService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,6 +20,12 @@ public class DirettoreController {
 
     @Autowired
     private DirettoreService direttoreService;
+
+    @Autowired
+    private CittaService cittaService;
+
+    @Autowired
+    private AcmeHomeService acmeHomeService;
 
     @CrossOrigin
     @GetMapping(value = "/all")
@@ -72,5 +83,62 @@ public class DirettoreController {
         } catch (Exception e) {
             throw e;
         }
+    }
+
+    @CrossOrigin
+    @PostMapping(value = "/loginDirettore")
+    private ResponseEntity loginDirettore(@RequestBody Direttore direttore) {
+        try {
+            Direttore direttore1oggato = direttoreService.loginDirettore(direttore);
+            return ResponseEntity.status(HttpStatus.OK).header("Login Direttore", "--- OK --- Direttore Loggato Con Successo")
+                    .body("Il Direttore con codice: " + direttore1oggato.getCodiceDirettore() + " ha effettuato l'accesso\n\n"
+                            + "Direttore\n" +
+                            "Nome: " + direttore1oggato.getNome() + "\n" +
+                            "Cognome: " + direttore1oggato.getCognome() + "\n" +
+                            "Ristoranti: " + (direttore1oggato.getRistoranti() != null ? direttore1oggato.getRistoranti() : "nessun Ristorante" )
+                    );
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    @CrossOrigin
+    @PostMapping(value = "/confermaInserimentoRistorante/{codiceRistorante}")
+    private ResponseEntity confermaInserimentoRistorante(@PathVariable String codiceRistorante, @RequestBody Direttore direttoreCorrente) {
+        try {
+            Direttore direttore = direttoreService.confermaInserimentoRistorante(codiceRistorante, direttoreCorrente);
+            Citta citta = cittaService.confermaInserimentoRistorante(codiceRistorante);
+            AcmeHome acmeHome = acmeHomeService.confermaInserimentoRistorante(codiceRistorante);
+            return ResponseEntity.status(HttpStatus.OK).header("Conferma Inserimento Ristorante", "--- OK --- Inserimento Ristorante Eseguito Con Successo")
+                    .body("Direttore\n" +
+                                "Nome: " + direttore.getNome() + "\n" +
+                                "Cognome: " + direttore.getCognome() + "\n" +
+                                "Ristoranti: " + (direttore.getRistoranti() != null ? ristoranteToString(direttore.getRistoranti()) : "nessun Ristorante" ) + "\n" +
+
+                            "Citta\n" +
+                                "Nome: " + citta.getNome() + "\n" +
+                                "Ristoranti: " + (citta.getRistoranti() != null ? ristoranteToString(citta.getRistoranti()) : "nessun Ristorante" ) + "\n" +
+
+                            "Azienda\n" +
+                                "Ristoranti: " + (acmeHome.getQuindiciRistorantiRecenti() != null ? ristoranteToString(acmeHome.getQuindiciRistorantiRecenti()) : "nessun Ristorante" ) + "\n"
+                    );
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    private StringBuilder ristoranteToString(List<Ristorante> ristoranti) {
+        StringBuilder listaRistoranti = new StringBuilder();
+        for (Ristorante r : ristoranti) {
+            String dettaglioRistorante =
+                    " Codice Ristorante: " + r.getCodiceRistorante() + "\n" +
+                    " Nome Ristorante: " + r.getNome() + "\n" +
+                    " Descrizone: " + r.getDescrizione() + "\n" +
+                    " codiceCitta: " + r.getCodiceCitta() + "\n" +
+                    " codiceDirettore: " + r.getCodiceDirettore() + "\n" +
+                    " codiceMenu: " + r.getCodiceMenu() + "\n\n";
+            listaRistoranti.append(dettaglioRistorante);
+        }
+        return listaRistoranti;
     }
 }

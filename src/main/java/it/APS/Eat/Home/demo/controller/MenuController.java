@@ -55,11 +55,11 @@ public class MenuController {
     }
 
     @CrossOrigin
-    @PutMapping(value = "/insertProductToMenu/{codiceMenu}")
-    public ResponseEntity aggiungiProdottoNelMenu(@PathVariable String codiceMenu, @RequestBody String codiceProdottoDaInserire) {
+    @PostMapping(value = "/insertProductToMenu/{codiceMenu}")
+    public ResponseEntity aggiungiProdottoNelMenu(@PathVariable String codiceMenu, @RequestBody Prodotto ProdottoDaInserire) {
         try {
-            Menu menu = menuService.aggiungiProdottoNelMenu(codiceMenu, codiceProdottoDaInserire);
-            return ResponseEntity.status(HttpStatus.OK).header("Inserimento Prodotto: " + codiceProdottoDaInserire + " nel Menu " + codiceMenu, "--- OK --- Prodotto Inserito Con Successo").body(menu);
+            Menu menu = menuService.aggiungiProdottoNelMenu(codiceMenu, ProdottoDaInserire);
+            return ResponseEntity.status(HttpStatus.OK).header("Inserimento Prodotto: " + ProdottoDaInserire.getCodiceProdotto() + " nel Menu " + codiceMenu, "--- OK --- Prodotto Inserito Con Successo").body(menu);
         } catch (Exception e) {
             throw e;
         }
@@ -70,7 +70,7 @@ public class MenuController {
     public ResponseEntity selezionaProdottoSpecialeDelMenu(@PathVariable String codiceMenu, @RequestBody String codiceProdottoSpeciale) {
         try {
             Menu menu = menuService.selezionaProdottoSpecialeDelMenu(codiceMenu, codiceProdottoSpeciale);
-            return ResponseEntity.status(HttpStatus.OK).header("Prodotto speciale: " + codiceProdottoSpeciale + " nel Menu " + codiceMenu, "--- OK --- Prodotto speciale Salvato Con Successo").body(menu);
+            return ResponseEntity.status(HttpStatus.OK).header("Prodotto speciale: " + codiceProdottoSpeciale + " nel Menu: " + codiceMenu, "--- OK --- Prodotto speciale Salvato Con Successo").body(menu);
         } catch (Exception e) {
             throw e;
         }
@@ -106,7 +106,7 @@ public class MenuController {
     private ResponseEntity deleteMenuByCodice(@PathVariable String codice) {
         try {
             menuService.deleteMenuByCodice(codice);
-            return ResponseEntity.status(HttpStatus.OK).header("Eliminazione Menu", "--- OK --- Menu Eliminato Con Successo").body("Il Menu con codice: " + codice + " è stata Eliminato con Successo");
+            return ResponseEntity.status(HttpStatus.OK).header("Eliminazione Menu", "--- OK --- Menu Eliminato Con Successo").body("Il Menu con codice: " + codice + " è stato Eliminato con Successo");
         } catch (Exception e) {
             throw e;
         }
