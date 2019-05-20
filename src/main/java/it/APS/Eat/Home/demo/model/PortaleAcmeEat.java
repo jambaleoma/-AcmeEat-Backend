@@ -7,22 +7,23 @@ import org.springframework.data.couchbase.core.mapping.Document;
 import org.springframework.data.couchbase.core.mapping.id.GeneratedValue;
 import org.springframework.data.couchbase.core.mapping.id.GenerationStrategy;
 
-import java.util.List;
-
 @Data
 @Document
-public class AcmeHome {
+public class PortaleAcmeEat {
 
     @Id
     @GeneratedValue( strategy = GenerationStrategy.UNIQUE)
-    private String codiceAzienda;
+    private String codicePortale;
 
     @Field
-    private List<Citta> citta;
+    private Citta cittaCorrente;
 
     @Field
-    private List<Direttore> direttori;
+    private Direttore direttoreCorrente;
 
     @Field
-    private List<Ristorante> quindiciRistorantiRecenti;
+    private Ristorante ristoranteCorrente;
+
+    @Field
+    private AcmeHome azienda;
 }

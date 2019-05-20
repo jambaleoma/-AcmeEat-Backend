@@ -33,10 +33,9 @@ public class AcmeHomeServiceImpl implements AcmeHomeService{
     public AcmeHome aggingiAzienda(AcmeHome acmeHome) { return acmeHomeRepository.save(acmeHome);}
 
     @Override
-    public List<Ristorante> aggiungiNuovoRistorante(AcmeHome acmeHome, Ristorante ristorante) {
-        AcmeHome azienda = this.acmeHomeRepository.findById(acmeHome.getCodiceAzienda()).orElse(null);
-        azienda.getQuindiciRistorantiRecenti().add(ristorante);
-        return azienda.getQuindiciRistorantiRecenti().subList(0, 15);
+    public List<Ristorante> getUtlimiQuindiciRistorantiInseriti() {
+        AcmeHome azienda = this.getAzienda();
+        return  azienda.getQuindiciRistorantiRecenti();
     }
 
     @Override

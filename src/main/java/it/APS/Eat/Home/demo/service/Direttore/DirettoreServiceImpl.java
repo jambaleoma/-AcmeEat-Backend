@@ -7,6 +7,7 @@ import it.APS.Eat.Home.demo.model.Direttore;
 import it.APS.Eat.Home.demo.model.Ristorante;
 import it.APS.Eat.Home.demo.repository.DirettoreRepository;
 import it.APS.Eat.Home.demo.repository.RistoranteRepository;
+import it.APS.Eat.Home.demo.service.AcmehomePortale.PortaleAcmeEatService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -20,6 +21,9 @@ public class DirettoreServiceImpl implements DirettoreService{
 
     @Autowired
     private RistoranteRepository ristoranteRepository;
+
+    @Autowired
+    private PortaleAcmeEatService portaleAcmeEatService;
 
     @Override
     public List<Direttore> getAllDirettori() {
@@ -67,8 +71,10 @@ public class DirettoreServiceImpl implements DirettoreService{
         if (this.direttoreRepository.existsById(direttore.getCodiceDirettore())) {
             if (direttore.getPsw().length() > 5) {
                 Direttore direttoreDB = this.getDirettoreByCodice(direttore.getCodiceDirettore());
-                if(direttoreDB.getPsw().equals(direttore.getPsw()))
+                if(direttoreDB.getPsw().equals(direttore.getPsw())) {
+                    this.portaleAcmeEatService.setDirettoreCorrente(direttoreDB.getCodiceDirettore());
                     return direttoreDB;
+                }
                 else
                     throw new IncorrectPasswordException("Password Errata");
             } else {
@@ -80,11 +86,23 @@ public class DirettoreServiceImpl implements DirettoreService{
     }
 
     @Override
-    public Direttore confermaInserimentoRistorante(String codiceRistorante, Direttore direttoreCorrente) {
+    public Direttore logoutDirettore(Direttore direttore) {
+        if (this.direttoreRepository.existsById(direttore.getCodiceDirettore())) {
+                this.portaleAcmeEatService.setRistoranteCorrente("");
+                this.portaleAcmeEatService.setCittaCorrente("");
+                this.portaleAcmeEatService.setDirettoreCorrente("");
+                return this.getDirettoreByCodice(direttore.getCodiceDirettore());
+        } else {
+            throw new NotFoundException("Il Direttore non Esiste");
+        }
+    }
+
+    @Override
+    public Direttore confermaInserimentoRistorante(String codiceRistorante, String codiceDirettore) {
         if (this.ristoranteRepository.existsById(codiceRistorante)) {
             Ristorante ristorante = ristoranteRepository.findById(codiceRistorante).orElse(null);
-            if (this.direttoreRepository.existsById(direttoreCorrente.getCodiceDirettore())) {
-                Direttore direttore = this.direttoreRepository.findById(direttoreCorrente.getCodiceDirettore()).orElse(null);
+            if (this.direttoreRepository.existsById(codiceDirettore)) {
+                Direttore direttore = this.direttoreRepository.findById(codiceDirettore).orElse(null);
                 direttore.getRistoranti().add(ristorante);
                 this.updateDirettore(direttore, direttore.getCodiceDirettore());
                 return direttore;

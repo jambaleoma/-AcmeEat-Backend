@@ -55,28 +55,6 @@ public class MenuController {
     }
 
     @CrossOrigin
-    @PostMapping(value = "/insertProductToMenu/{codiceMenu}")
-    public ResponseEntity aggiungiProdottoNelMenu(@PathVariable String codiceMenu, @RequestBody Prodotto ProdottoDaInserire) {
-        try {
-            Menu menu = menuService.aggiungiProdottoNelMenu(codiceMenu, ProdottoDaInserire);
-            return ResponseEntity.status(HttpStatus.OK).header("Inserimento Prodotto: " + ProdottoDaInserire.getCodiceProdotto() + " nel Menu " + codiceMenu, "--- OK --- Prodotto Inserito Con Successo").body(menu);
-        } catch (Exception e) {
-            throw e;
-        }
-    }
-
-    @CrossOrigin
-    @PutMapping(value = "/selectSpecialProductToMenu/{codiceMenu}")
-    public ResponseEntity selezionaProdottoSpecialeDelMenu(@PathVariable String codiceMenu, @RequestBody String codiceProdottoSpeciale) {
-        try {
-            Menu menu = menuService.selezionaProdottoSpecialeDelMenu(codiceMenu, codiceProdottoSpeciale);
-            return ResponseEntity.status(HttpStatus.OK).header("Prodotto speciale: " + codiceProdottoSpeciale + " nel Menu: " + codiceMenu, "--- OK --- Prodotto speciale Salvato Con Successo").body(menu);
-        } catch (Exception e) {
-            throw e;
-        }
-    }
-
-    @CrossOrigin
     @DeleteMapping(value = "/deleteProductToMenu/{codiceMenu}")
     public ResponseEntity eliminaProdottoNelMenu(@PathVariable String codiceMenu, @RequestBody String codiceProdottoDaEliminare) {
         try {

@@ -15,4 +15,5 @@ public interface MenuService {
     Menu getMenuByCodice(String codice);
     Menu updateMenu(Menu nuovoMenu, String codice);
     Menu deleteMenuByCodice(String codice);
+    Menu terminaInserimento(String codice);
 }

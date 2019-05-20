@@ -33,9 +33,6 @@ public class Ristorante {
     private String codiceMenu;
 
     @Field
-    private String codiceCucina;
-
-    @Field
     private List<String> codiciOridinazioni;
 
 }

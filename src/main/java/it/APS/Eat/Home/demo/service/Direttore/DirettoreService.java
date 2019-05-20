@@ -13,5 +13,6 @@ public interface DirettoreService {
     Direttore updateDirettore(Direttore nuovoDirettore, String codice);
     Direttore deleteDirettoreByCodice(String codice);
     Direttore loginDirettore(Direttore direttore);
-    Direttore confermaInserimentoRistorante(String codiceRistorante,  Direttore direttoreCorrente);
+    Direttore logoutDirettore(Direttore direttore);
+    Direttore confermaInserimentoRistorante(String codiceRistorante,  String codiceDirettore);
 }

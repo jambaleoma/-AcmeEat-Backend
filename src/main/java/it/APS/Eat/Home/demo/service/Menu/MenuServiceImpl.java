@@ -128,4 +128,16 @@ public class MenuServiceImpl implements MenuService{
         this.menuRepository.delete(m);
         return m;
     }
+
+    @Override
+    public Menu terminaInserimento(String codice) {
+        if (this.menuRepository.existsById(codice)) {
+            Menu m = this.getMenuByCodice(codice);
+            m.setIsListaProdottiCompleta(true);
+            this.updateMenu(m, codice);
+            return m;
+        } else {
+            throw new NotFoundException("Il Menu non Esiste");
+        }
+    }
 }

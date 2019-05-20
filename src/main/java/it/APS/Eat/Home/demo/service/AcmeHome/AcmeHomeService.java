@@ -10,7 +10,7 @@ public interface AcmeHomeService {
 
     AcmeHome getAzienda();
     AcmeHome aggingiAzienda(AcmeHome acmeHome);
-    List<Ristorante> aggiungiNuovoRistorante(AcmeHome acmeHome, Ristorante ristorante);
+    List<Ristorante> getUtlimiQuindiciRistorantiInseriti();
     List<Citta> getAllCitta();
     AcmeHome confermaInserimentoRistorante(String codiceRistorante);
 }
