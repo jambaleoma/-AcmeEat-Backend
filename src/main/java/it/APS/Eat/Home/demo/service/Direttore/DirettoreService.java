@@ -1,7 +1,6 @@
 package it.APS.Eat.Home.demo.service.Direttore;
 
 import it.APS.Eat.Home.demo.model.Direttore;
-import it.APS.Eat.Home.demo.model.Ristorante;
 
 import java.util.List;
 

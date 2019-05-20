@@ -1,18 +1,12 @@
 package it.APS.Eat.Home.demo.controller;
 
-import it.APS.Eat.Home.demo.model.*;
-import it.APS.Eat.Home.demo.service.AcmeHome.AcmeHomeService;
-import it.APS.Eat.Home.demo.service.AcmeHome.AcmeHomeServiceImpl;
-import it.APS.Eat.Home.demo.service.Menu.MenuService;
-import it.APS.Eat.Home.demo.service.Prodotto.ProdottoService;
+import it.APS.Eat.Home.demo.model.Ristorante;
 import it.APS.Eat.Home.demo.service.Ristorante.RistoranteService;
-import jdk.nashorn.internal.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -21,15 +15,6 @@ public class RistoranteController {
     
     @Autowired
     private RistoranteService ristoranteService;
-
-    @Autowired
-    private AcmeHomeService acmeHomeService;
-
-    @Autowired
-    private MenuService menuService;
-
-    @Autowired
-    private ProdottoService prodottoService;
 
     @CrossOrigin
     @GetMapping(value = "/all")
@@ -48,28 +33,6 @@ public class RistoranteController {
         try {
             Ristorante ristorante = ristoranteService.getRistoranteByCodice(codice);
             return ResponseEntity.status(HttpStatus.OK).header("Ristorante Trovato", "--- OK --- Ristorante Trovato Con Successo").body(ristorante);
-        } catch (Exception e) {
-            throw e;
-        }
-    }
-
-    @CrossOrigin
-    @PutMapping(value = "/setCittaDelRistorante/{codiceRistorante}")
-    private ResponseEntity selezionaCittaDelRistorante(@PathVariable String codiceRistorante, @RequestBody String codiceCitta) {
-        try {
-            Ristorante ristorante = ristoranteService.selezionaCittaDelRistorante(codiceRistorante, codiceCitta);
-            return ResponseEntity.status(HttpStatus.OK).header("Aggiornamento Ristorante", "--- OK --- Ristorante Aggiornato Con Successo").body(ristorante);
-        } catch (Exception e) {
-            throw e;
-        }
-    }
-
-    @CrossOrigin
-    @PutMapping(value = "/setDirettoreDelRistorante/{codiceRistorante}")
-    private ResponseEntity aggiungiDirettoreDelRistorante(@PathVariable String codiceRistorante, @RequestBody String codiceDirettore) {
-        try {
-            Ristorante ristorante = ristoranteService.aggiungiDirettoreDelRistorante(codiceRistorante, codiceDirettore);
-            return ResponseEntity.status(HttpStatus.OK).header("Aggiornamento Ristorante", "--- OK --- Ristorante Aggiornato Con Successo").body(ristorante);
         } catch (Exception e) {
             throw e;
         }

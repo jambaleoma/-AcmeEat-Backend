@@ -1,7 +1,6 @@
 package it.APS.Eat.Home.demo.service.Citta;
 
 import it.APS.Eat.Home.demo.model.Citta;
-import it.APS.Eat.Home.demo.model.Ristorante;
 
 import java.util.List;
 

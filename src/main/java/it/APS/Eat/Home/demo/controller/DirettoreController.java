@@ -1,9 +1,6 @@
 package it.APS.Eat.Home.demo.controller;
 
-import it.APS.Eat.Home.demo.model.AcmeHome;
-import it.APS.Eat.Home.demo.model.Citta;
 import it.APS.Eat.Home.demo.model.Direttore;
-import it.APS.Eat.Home.demo.model.Ristorante;
 import it.APS.Eat.Home.demo.service.AcmeHome.AcmeHomeService;
 import it.APS.Eat.Home.demo.service.Citta.CittaService;
 import it.APS.Eat.Home.demo.service.Direttore.DirettoreService;

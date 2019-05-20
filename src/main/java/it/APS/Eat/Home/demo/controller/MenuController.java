@@ -1,7 +1,6 @@
 package it.APS.Eat.Home.demo.controller;
 
 import it.APS.Eat.Home.demo.model.Menu;
-import it.APS.Eat.Home.demo.model.Prodotto;
 import it.APS.Eat.Home.demo.service.Menu.MenuService;
 import it.APS.Eat.Home.demo.service.Prodotto.ProdottoService;
 import org.springframework.beans.factory.annotation.Autowired;

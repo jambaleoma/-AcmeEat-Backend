@@ -1,7 +1,6 @@
 package it.APS.Eat.Home.demo.service.Citta;
 
 import it.APS.Eat.Home.demo.Exception.NotFoundException;
-import it.APS.Eat.Home.demo.model.AcmeHome;
 import it.APS.Eat.Home.demo.model.Citta;
 import it.APS.Eat.Home.demo.model.Ristorante;
 import it.APS.Eat.Home.demo.repository.CittaRepository;
