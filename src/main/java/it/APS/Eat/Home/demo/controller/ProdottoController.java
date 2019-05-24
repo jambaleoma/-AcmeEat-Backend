@@ -53,9 +53,6 @@ public class ProdottoController {
     @PutMapping(value = "/updateProdotto/{codice}")
     private ResponseEntity updateProdotto (@RequestBody Prodotto nuovoProdotto, @PathVariable String codice) {
         try {
-            if (nuovoProdotto.getCodiceProdotto() != null) {
-                nuovoProdotto.setCodiceProdotto(null);
-            }
             prodottoService.updateProdotto(nuovoProdotto, codice);
             return ResponseEntity.status(HttpStatus.OK).header("Aggiornamento Prodotto", "--- OK --- Prodotto Aggiornato Con Successo").body(getAllProdotti().getBody());
         } catch (Exception e) {

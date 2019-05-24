@@ -68,9 +68,6 @@ public class MenuController {
     @PutMapping(value = "/updateMenu/{codice}")
     private ResponseEntity updateMenu (@RequestBody Menu nuovoMenu, @PathVariable String codice) {
         try {
-            if (nuovoMenu.getCodiceMenu() != null) {
-                nuovoMenu.setCodiceMenu(null);
-            }
             menuService.updateMenu(nuovoMenu, codice);
             return ResponseEntity.status(HttpStatus.OK).header("Aggiornamento Menu", "--- OK --- Menu Aggiornato Con Successo").body(getAllMenu().getBody());
         } catch (Exception e) {

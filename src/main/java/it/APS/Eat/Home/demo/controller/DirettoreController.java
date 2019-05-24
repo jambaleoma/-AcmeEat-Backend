@@ -61,9 +61,6 @@ public class DirettoreController {
     @PutMapping(value = "/updateDirettore/{codice}")
     private ResponseEntity updateDirettore (@RequestBody Direttore nuovoDirettore, @PathVariable String codice) {
         try {
-            if (nuovoDirettore.getCodiceDirettore() != null) {
-                nuovoDirettore.setCodiceDirettore(null);
-            }
             direttoreService.updateDirettore(nuovoDirettore, codice);
             return ResponseEntity.status(HttpStatus.OK).header("Aggiornamento Direttore", "--- OK --- Direttore Aggiornato Con Successo").body(getAllDirettori().getBody());
         } catch (Exception e) {

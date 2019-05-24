@@ -41,7 +41,11 @@ public class DirettoreServiceImpl implements DirettoreService{
 
     @Override
     public Direttore getDirettoreByCodice(String codice) {
-        return direttoreRepository.findById(codice).orElse(null);
+        if (this.direttoreRepository.existsById(codice)) {
+            return direttoreRepository.findById(codice).orElse(null);
+        } else {
+            throw new NotFoundException("Il Direttore non Esiste");
+        }
     }
 
     @Override
@@ -67,37 +71,6 @@ public class DirettoreServiceImpl implements DirettoreService{
     }
 
     @Override
-    public Direttore loginDirettore(Direttore direttore) {
-        if (this.direttoreRepository.existsById(direttore.getCodiceDirettore())) {
-            if (direttore.getPsw().length() > 5) {
-                Direttore direttoreDB = this.getDirettoreByCodice(direttore.getCodiceDirettore());
-                if(direttoreDB.getPsw().equals(direttore.getPsw())) {
-                    this.portaleAcmeEatService.setDirettoreCorrente(direttoreDB.getCodiceDirettore());
-                    return direttoreDB;
-                }
-                else
-                    throw new IncorrectPasswordException("Password Errata");
-            } else {
-                throw new PasswordLengthException("Password troppo corta, inserire almeno 6 caratteri");
-            }
-        } else {
-            throw new NotFoundException("Il Direttore non Esiste");
-        }
-    }
-
-    @Override
-    public Direttore logoutDirettore(Direttore direttore) {
-        if (this.direttoreRepository.existsById(direttore.getCodiceDirettore())) {
-                this.portaleAcmeEatService.setRistoranteCorrente("");
-                this.portaleAcmeEatService.setCittaCorrente("");
-                this.portaleAcmeEatService.setDirettoreCorrente("");
-                return this.getDirettoreByCodice(direttore.getCodiceDirettore());
-        } else {
-            throw new NotFoundException("Il Direttore non Esiste");
-        }
-    }
-
-    @Override
     public Direttore confermaInserimentoRistorante(String codiceRistorante, String codiceDirettore) {
         if (this.ristoranteRepository.existsById(codiceRistorante)) {
             Ristorante ristorante = ristoranteRepository.findById(codiceRistorante).orElse(null);
@@ -113,4 +86,15 @@ public class DirettoreServiceImpl implements DirettoreService{
             throw new NotFoundException("Il Ristorante non Esiste");
         }
     }
+
+    @Override
+    public Direttore checkPassword(Direttore direttoreDB, String psw) {
+        if(direttoreDB.getPsw().equals(psw)) {
+            this.portaleAcmeEatService.setDirettoreCorrente(direttoreDB.getCodiceDirettore());
+            return direttoreDB;
+        }
+        else
+            throw new IncorrectPasswordException("Password Errata");
+    }
+
 }

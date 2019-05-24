@@ -52,9 +52,6 @@ public class ConsumatoreController {
     @PutMapping(value = "/updateConsumatore/{codice}")
     private ResponseEntity updateConsumatore (@RequestBody Consumatore nuovoConsumatore, @PathVariable String codice) {
         try {
-            if (nuovoConsumatore.getCodiceConsumatore() != null) {
-                nuovoConsumatore.setCodiceConsumatore(null);
-            }
             consumatoreService.updateConsumatore(nuovoConsumatore, codice);
             return ResponseEntity.status(HttpStatus.OK).header("Aggiornamento Consumatore", "--- OK --- Consumatore Aggiornato Con Successo").body(getAllConsumatori().getBody());
         } catch (Exception e) {

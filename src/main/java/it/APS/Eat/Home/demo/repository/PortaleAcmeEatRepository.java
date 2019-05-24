@@ -7,5 +7,5 @@ import org.springframework.data.couchbase.repository.CouchbasePagingAndSortingRe
 import org.springframework.data.repository.CrudRepository;
 
 @N1qlPrimaryIndexed
-@ViewIndexed(designDoc = "ristorante")
-public interface PortaleAcmehomeRepository extends CouchbasePagingAndSortingRepository<PortaleAcmeEat, String>, CrudRepository<PortaleAcmeEat, String> {}
+@ViewIndexed(designDoc = "portaleAcmeEat")
+public interface PortaleAcmeEatRepository extends CouchbasePagingAndSortingRepository<PortaleAcmeEat, String>, CrudRepository<PortaleAcmeEat, String> {}

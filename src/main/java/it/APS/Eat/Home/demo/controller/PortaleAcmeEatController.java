@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/rest/portaleAcmehome")
+@RequestMapping("/rest/portaleAcmeEat")
 public class PortaleAcmeEatController {
 
     @Autowired
@@ -53,16 +53,27 @@ public class PortaleAcmeEatController {
     }
 
     @CrossOrigin
+    @GetMapping(value = "/getPortale")
+    public ResponseEntity getPortale() {
+        try {
+            PortaleAcmeEat p = this.portaleAcmeEatService.getPortale();
+            return ResponseEntity.status(HttpStatus.OK).header("Sessione Portale", "--- OK --- Sessione Portale Trovata con Successo").body(p);
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    @CrossOrigin
     @PostMapping(value = "/loginDirettore")
     private ResponseEntity loginDirettore(@RequestBody Direttore direttore) {
         try {
-            Direttore direttore1oggato = direttoreService.loginDirettore(direttore);
+            Direttore direttore1oggato = this.portaleAcmeEatService.loginDirettore(direttore);
             return ResponseEntity.status(HttpStatus.OK).header("Login Direttore", "--- OK --- Direttore Loggato Con Successo")
                     .body("Il Direttore con codice: " + direttore1oggato.getCodiceDirettore() + " ha effettuato l'accesso\n\n"
                             + "Direttore\n" +
                             "Nome: " + direttore1oggato.getNome() + "\n" +
                             "Cognome: " + direttore1oggato.getCognome() + "\n" +
-                            "Ristoranti: " + (direttore1oggato.getRistoranti() != null ? direttore1oggato.getRistoranti() : "nessun Ristorante" )
+                            "Ristoranti: \n" + (direttore1oggato.getRistoranti() != null ? ristoranteToString(direttore1oggato.getRistoranti()) : "nessun Ristorante" )
                     );
         } catch (Exception e) {
             throw e;
@@ -70,10 +81,10 @@ public class PortaleAcmeEatController {
     }
 
     @CrossOrigin
-    @PostMapping(value = "/logoutDirettore")
-    private ResponseEntity logoutDirettore(@RequestBody Direttore direttore) {
+    @GetMapping(value = "/logoutDirettore")
+    private ResponseEntity logoutDirettore() {
         try {
-            Direttore direttore1oggato = direttoreService.logoutDirettore(direttore);
+            portaleAcmeEatService.logoutDirettore();
             return ResponseEntity.status(HttpStatus.OK).header("Logout Direttore", "--- OK --- Uscita effettuata Con Successo").body("Uscita effettuata Con Successo");
         } catch (Exception e) {
             throw e;
@@ -167,19 +178,19 @@ public class PortaleAcmeEatController {
             Ristorante ristorante = this.ristoranteService.getRistoranteByCodice(codiceRistorante);
             Direttore direttore =  this.direttoreService.confermaInserimentoRistorante(ristorante.getCodiceRistorante(), ristorante.getCodiceDirettore());
             Citta citta = cittaService.confermaInserimentoRistorante(ristorante.getCodiceRistorante());
-            AcmeHome acmeHome = acmeHomeService.confermaInserimentoRistorante(ristorante.getCodiceRistorante());
+            AcmeHome acmeHome = acmeHomeService.addRistoranteToUltimi15(ristorante.getCodiceRistorante());
             return ResponseEntity.status(HttpStatus.OK).header("Conferma Inserimento Ristorante", "--- OK --- Inserimento Ristorante Eseguito Con Successo")
                     .body("Direttore\n" +
                             "Nome: " + direttore.getNome() + "\n" +
                             "Cognome: " + direttore.getCognome() + "\n" +
-                            "Ristoranti: " + (direttore.getRistoranti() != null ? ristoranteToString(direttore.getRistoranti()) : "nessun Ristorante" ) + "\n" +
+                            "Ristoranti:\n " + (direttore.getRistoranti() != null ? ristoranteToString(direttore.getRistoranti()) : "nessun Ristorante" ) + "\n" +
 
                             "Citta\n" +
                             "Nome: " + citta.getNome() + "\n" +
-                            "Ristoranti: " + (citta.getRistoranti() != null ? ristoranteToString(citta.getRistoranti()) : "nessun Ristorante" ) + "\n" +
+                            "Ristoranti:\n " + (citta.getRistoranti() != null ? ristoranteToString(citta.getRistoranti()) : "nessun Ristorante" ) + "\n" +
 
                             "Azienda\n" +
-                            "Ristoranti: " + (acmeHome.getQuindiciRistorantiRecenti() != null ? ristoranteToString(acmeHome.getQuindiciRistorantiRecenti()) : "nessun Ristorante" ) + "\n"
+                            "Ristoranti:\n " + (acmeHome.getQuindiciRistorantiRecenti() != null ? ristoranteToString(acmeHome.getQuindiciRistorantiRecenti()) : "nessun Ristorante" ) + "\n"
                     );
         } catch (Exception e) {
             throw e;

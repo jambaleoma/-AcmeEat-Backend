@@ -8,9 +8,11 @@ public interface PortaleAcmeEatService {
     PortaleAcmeEat getPortale();
     AcmeHome getAzienda();
     Ristorante getRistoranteCorrente();
-    Ristorante setRistoranteCorrente(String codice);
+    String setRistoranteCorrente(String codice);
     Citta getCittaCorrente();
-    Citta setCittaCorrente(String codice);
+    String setCittaCorrente(String codice);
     Direttore getDirettoreCorrente();
-    Direttore setDirettoreCorrente(String codice);
+    String setDirettoreCorrente(String codice);
+    Direttore loginDirettore(Direttore direttore);
+    void logoutDirettore();
 }

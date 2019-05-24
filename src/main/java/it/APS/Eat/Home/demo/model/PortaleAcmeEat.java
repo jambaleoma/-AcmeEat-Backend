@@ -16,14 +16,14 @@ public class PortaleAcmeEat {
     private String codicePortale;
 
     @Field
-    private Citta cittaCorrente;
+    private String codiceCittaCorrente;
 
     @Field
-    private Direttore direttoreCorrente;
+    private String codiceDirettoreCorrente;
 
     @Field
-    private Ristorante ristoranteCorrente;
+    private String codiceRistoranteCorrente;
 
     @Field
-    private AcmeHome azienda;
+    private String codiceAzienda;
 }

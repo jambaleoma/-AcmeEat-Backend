@@ -53,9 +53,6 @@ public class CittaController {
     @PutMapping(value = "/updateCitta/{codice}")
     private ResponseEntity updateCitta (@RequestBody Citta nuovaCitta, @PathVariable String codice) {
         try {
-            if (nuovaCitta.getCodiceCitta() != null) {
-                nuovaCitta.setCodiceCitta(null);
-            }
             cittaService.updateCitta(nuovaCitta, codice);
             return ResponseEntity.status(HttpStatus.OK).header("Aggiornamento Citta", "--- OK --- Citta Aggiornata Con Successo").body(getAllCitta().getBody());
         } catch (Exception e) {

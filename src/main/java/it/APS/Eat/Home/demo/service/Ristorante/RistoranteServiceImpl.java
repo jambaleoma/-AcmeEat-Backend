@@ -37,6 +37,7 @@ public class RistoranteServiceImpl implements RistoranteService{
     public Ristorante aggiungiRistorante(Ristorante ristorante) {
         Menu m = new Menu();
         this.menuService.aggiungiMenu(m);
+        ristorante.setCodiceDirettore(this.portaleAcmeEatService.getDirettoreCorrente().getCodiceDirettore());
         ristorante.setCodiciOridinazioni(new ArrayList<>());
         ristorante.setCodiceMenu(m.getCodiceMenu());
         Ristorante r = this.ristoranteRepository.save(ristorante);

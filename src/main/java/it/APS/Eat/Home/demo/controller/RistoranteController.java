@@ -53,9 +53,6 @@ public class RistoranteController {
     @PutMapping(value = "/updateRistorante/{codice}")
     private ResponseEntity updateRistorante (@RequestBody Ristorante nuovoRistorante, @PathVariable String codice) {
         try {
-            if (nuovoRistorante.getCodiceRistorante() != null) {
-                nuovoRistorante.setCodiceRistorante(null);
-            }
             ristoranteService.updateRistorante(nuovoRistorante, codice);
             return ResponseEntity.status(HttpStatus.OK).header("Aggiornamento Ristorante", "--- OK --- Ristorante Aggiornato Con Successo").body(getAllRistoranti().getBody());
         } catch (Exception e) {
