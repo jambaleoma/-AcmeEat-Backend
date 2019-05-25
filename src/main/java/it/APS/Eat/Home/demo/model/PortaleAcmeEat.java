@@ -25,5 +25,8 @@ public class PortaleAcmeEat {
     private String codiceRistoranteCorrente;
 
     @Field
+    private String codiceConsumatoreCorrente;
+
+    @Field
     private String codiceAzienda;
 }

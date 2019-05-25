@@ -9,6 +9,7 @@ import it.APS.Eat.Home.demo.repository.DirettoreRepository;
 import it.APS.Eat.Home.demo.repository.PortaleAcmeEatRepository;
 import it.APS.Eat.Home.demo.service.AcmeHome.AcmeHomeService;
 import it.APS.Eat.Home.demo.service.Citta.CittaService;
+import it.APS.Eat.Home.demo.service.Consumatore.ConsumatoreService;
 import it.APS.Eat.Home.demo.service.Direttore.DirettoreService;
 import it.APS.Eat.Home.demo.service.Ristorante.RistoranteService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,7 @@ public class PortaleAcmeEatServiceImpl implements PortaleAcmeEatService{
     private PortaleAcmeEatService portaleAcmeEatService;
 
     @Autowired
-    private DirettoreRepository direttoreRepository;
+    private ConsumatoreService consumatoreService;
 
     @Autowired
     private RistoranteService ristoranteService;
@@ -129,9 +130,38 @@ public class PortaleAcmeEatServiceImpl implements PortaleAcmeEatService{
     }
 
     @Override
+    public Consumatore getConsumatoreCorrente() {
+        PortaleAcmeEat portale = this.getPortale();
+        return this.consumatoreService.getConsumatoreByCodice(portale.getCodiceConsumatoreCorrente());
+    }
+
+    @Override
+    public String setConsumatoreCorrente(String codice) {
+        PortaleAcmeEat portale = this.getPortale();
+        if (codice == null) {
+            portale.setCodiceConsumatoreCorrente(null);
+        } else {
+            Consumatore c = this.consumatoreService.getConsumatoreByCodice(codice);
+            if (c != null) {
+                portale.setCodiceConsumatoreCorrente(c.getCodiceConsumatore());
+            } else {
+                throw new NotFoundException("Il Consumatore non Esiste");
+            }
+        }
+        this.portaleAcmehomeRepository.getCouchbaseOperations().update(portale);
+        return portale.getCodiceConsumatoreCorrente();
+    }
+
+    @Override
     public Direttore loginDirettore(Direttore direttore) {
         Direttore direttoreDB = this.direttoreService.getDirettoreByCodice(direttore.getCodiceDirettore());
         return this.direttoreService.checkPassword(direttoreDB, direttore.getPsw());
+    }
+
+    @Override
+    public Consumatore loginConsumatore(Consumatore consumatore) {
+        Consumatore consumatoreDB = this.consumatoreService.getConsumatoreByEmail(consumatore.getEmail());
+        return this.consumatoreService.checkPassword(consumatoreDB, consumatore.getPsw());
     }
 
     @Override
@@ -140,6 +170,18 @@ public class PortaleAcmeEatServiceImpl implements PortaleAcmeEatService{
             this.portaleAcmeEatService.setRistoranteCorrente(null);
             this.portaleAcmeEatService.setCittaCorrente(null);
             this.portaleAcmeEatService.setDirettoreCorrente(null);
+        } else {
+            throw new NotFoundException("Nessun Direttore Loggato Sul Portale");
+        }
+    }
+
+    @Override
+    public void logoutConsumatore() {
+        if (this.portaleAcmeEatService.getConsumatoreCorrente() != null) {
+            this.portaleAcmeEatService.setRistoranteCorrente(null);
+            this.portaleAcmeEatService.setCittaCorrente(null);
+            this.portaleAcmeEatService.setDirettoreCorrente(null);
+            this.portaleAcmeEatService.setConsumatoreCorrente(null);
         } else {
             throw new NotFoundException("Nessun Direttore Loggato Sul Portale");
         }

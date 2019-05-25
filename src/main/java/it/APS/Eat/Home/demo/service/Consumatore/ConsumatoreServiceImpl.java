@@ -1,8 +1,10 @@
 package it.APS.Eat.Home.demo.service.Consumatore;
 
+import it.APS.Eat.Home.demo.Exception.IncorrectPasswordException;
 import it.APS.Eat.Home.demo.Exception.NotFoundException;
 import it.APS.Eat.Home.demo.model.Consumatore;
 import it.APS.Eat.Home.demo.repository.ConsumatoreRepository;
+import it.APS.Eat.Home.demo.service.AcmehomePortale.PortaleAcmeEatService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -13,6 +15,9 @@ public class ConsumatoreServiceImpl implements ConsumatoreService {
 
     @Autowired
     private ConsumatoreRepository consumatoreRepository;
+
+    @Autowired
+    private PortaleAcmeEatService portaleAcmeEatService;
 
     @Override
     public List<Consumatore> getAllConsumatori() {
@@ -31,6 +36,18 @@ public class ConsumatoreServiceImpl implements ConsumatoreService {
     @Override
     public Consumatore getConsumatoreByCodice(String codice) {
         return consumatoreRepository.findById(codice).orElse(null);
+    }
+
+    @Override
+    public Consumatore getConsumatoreByEmail(String email) {
+        Consumatore consumatore = null;
+        List<Consumatore> consumatori = this.getAllConsumatori();
+        for (Consumatore c : consumatori) {
+            if (c.getEmail().equals(email)) {
+                consumatore = c;
+            }
+        }
+        return consumatore;
     }
 
     @Override
@@ -55,5 +72,15 @@ public class ConsumatoreServiceImpl implements ConsumatoreService {
         Consumatore c = this.getConsumatoreByCodice(codice);
         this.consumatoreRepository.delete(c);
         return c;
+    }
+
+    @Override
+    public Consumatore checkPassword(Consumatore consumatoreDB, String psw) {
+        if(consumatoreDB.getPsw().equals(psw)) {
+            this.portaleAcmeEatService.setConsumatoreCorrente(consumatoreDB.getCodiceConsumatore());
+            return consumatoreDB;
+        }
+        else
+            throw new IncorrectPasswordException("Password Errata");
     }
 }

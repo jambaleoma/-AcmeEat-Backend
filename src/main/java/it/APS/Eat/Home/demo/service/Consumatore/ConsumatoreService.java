@@ -9,7 +9,9 @@ public interface ConsumatoreService {
     List<Consumatore> getAllConsumatori();
     Consumatore aggiungiConsumatore(Consumatore consumatore);
     Consumatore getConsumatoreByCodice(String codice);
+    Consumatore getConsumatoreByEmail(String email);
     Consumatore updateConsumatore(Consumatore nuovoConsumatore, String codice);
     Consumatore deleteConsumatoreByCodice(String codice);
+    Consumatore checkPassword(Consumatore consumatore, String psw);
 
 }

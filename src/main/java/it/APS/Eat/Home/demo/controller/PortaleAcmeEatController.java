@@ -64,6 +64,30 @@ public class PortaleAcmeEatController {
     }
 
     @CrossOrigin
+    @GetMapping(value = "/logoutDirettore")
+    private ResponseEntity logoutDirettore() {
+        try {
+            portaleAcmeEatService.logoutDirettore();
+            return ResponseEntity.status(HttpStatus.OK).header("Logout Direttore", "--- OK --- Uscita effettuata Con Successo").body("Uscita effettuata Con Successo");
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    @CrossOrigin
+    @GetMapping(value = "/logoutConsumatore")
+    private ResponseEntity logoutConsumatore() {
+        try {
+            portaleAcmeEatService.logoutConsumatore();
+            return ResponseEntity.status(HttpStatus.OK).header("Logout Consumatore", "--- OK --- Uscita effettuata Con Successo").body("Uscita effettuata Con Successo");
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    // Inzio Caso D'Uso UC1
+
+    @CrossOrigin
     @PostMapping(value = "/loginDirettore")
     private ResponseEntity loginDirettore(@RequestBody Direttore direttore) {
         try {
@@ -75,17 +99,6 @@ public class PortaleAcmeEatController {
                             "Cognome: " + direttore1oggato.getCognome() + "\n" +
                             "Ristoranti: \n" + (direttore1oggato.getRistoranti() != null ? ristoranteToString(direttore1oggato.getRistoranti()) : "nessun Ristorante" )
                     );
-        } catch (Exception e) {
-            throw e;
-        }
-    }
-
-    @CrossOrigin
-    @GetMapping(value = "/logoutDirettore")
-    private ResponseEntity logoutDirettore() {
-        try {
-            portaleAcmeEatService.logoutDirettore();
-            return ResponseEntity.status(HttpStatus.OK).header("Logout Direttore", "--- OK --- Uscita effettuata Con Successo").body("Uscita effettuata Con Successo");
         } catch (Exception e) {
             throw e;
         }
@@ -210,5 +223,26 @@ public class PortaleAcmeEatController {
             listaRistoranti.append(dettaglioRistorante);
         }
         return listaRistoranti;
+    }
+
+    // Fine Caso D'Uso UC1
+
+    // Inzio Caso D'Uso UC2
+
+    @CrossOrigin
+    @PostMapping(value = "/loginConsumatore")
+    private ResponseEntity loginConsumatore(@RequestBody Consumatore consumatore) {
+        try {
+            Consumatore consumatoreLoggato = this.portaleAcmeEatService.loginConsumatore(consumatore);
+            return ResponseEntity.status(HttpStatus.OK).header("Login Consumatore", "--- OK --- Consumatore Loggato Con Successo")
+                    .body("Il Consumatore con Email: " + consumatoreLoggato.getEmail() + " ha effettuato l'accesso\n\n" +
+                            "Consumatore\n" +
+                            "Nome: " + consumatoreLoggato.getNome() + "\n" +
+                            "Cognome: " + consumatoreLoggato.getCognome() + "\n" +
+                            "N.Cellulare: " + consumatoreLoggato.getCellulare()  + "\n"
+                    );
+        } catch (Exception e) {
+            throw e;
+        }
     }
 }
