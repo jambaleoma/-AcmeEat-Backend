@@ -24,5 +24,11 @@ public class AcmeHome {
     private List<Direttore> direttori;
 
     @Field
-    private List<Ristorante> quindiciRistorantiRecenti;
+    private List<Consumatore> consumatori;
+
+    @Field
+    private List<Ristorante> ristoranti;
+
+    @Field
+    private List<String> codiciQuindiciRistorantiRecenti;
 }

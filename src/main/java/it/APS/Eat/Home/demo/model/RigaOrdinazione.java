@@ -22,9 +22,9 @@ public class RigaOrdinazione {
     private Integer quantita;
 
     @Field
-    private Integer totaleRiga;
+    private Float totaleRiga;
 
     @Field
-    private Prodotto prodotto;
+    private String codiceProdotto;
 
 }

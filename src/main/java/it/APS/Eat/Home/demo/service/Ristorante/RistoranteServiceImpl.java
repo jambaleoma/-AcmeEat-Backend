@@ -38,7 +38,7 @@ public class RistoranteServiceImpl implements RistoranteService{
         Menu m = new Menu();
         this.menuService.aggiungiMenu(m);
         ristorante.setCodiceDirettore(this.portaleAcmeEatService.getDirettoreCorrente().getCodiceDirettore());
-        ristorante.setCodiciOridinazioni(new ArrayList<>());
+        ristorante.setCodiciOrdinazioni(new ArrayList<>());
         ristorante.setCodiceMenu(m.getCodiceMenu());
         Ristorante r = this.ristoranteRepository.save(ristorante);
         this.portaleAcmeEatService.setRistoranteCorrente(r.getCodiceRistorante());
@@ -61,7 +61,7 @@ public class RistoranteServiceImpl implements RistoranteService{
             r.setCodiceCitta(nuovoRistorante.getCodiceCitta());
             r.setCodiceMenu(nuovoRistorante.getCodiceMenu());
             r.setCodiceDirettore(nuovoRistorante.getCodiceDirettore());
-            r.setCodiciOridinazioni(nuovoRistorante.getCodiciOridinazioni());
+            r.setCodiciOrdinazioni(nuovoRistorante.getCodiciOrdinazioni());
             this.ristoranteRepository.getCouchbaseOperations().update(r);
             return r;
         } else {

@@ -9,6 +9,7 @@ public interface CittaService {
     List<Citta> getAllCitta();
     Citta aggiungiCitta(Citta citta);
     Citta getCittaByCodice(String codice);
+    Citta getCittaByName(String nomeCitta);
     Citta updateCitta(Citta nuovaCitta, String codice);
     Citta deleteCittaByCodice(String codice);
     Citta confermaInserimentoRistorante(String codiceRistorante);

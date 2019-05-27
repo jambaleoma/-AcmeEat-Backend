@@ -43,6 +43,17 @@ public class CittaServiceImpl implements CittaService {
     }
 
     @Override
+    public Citta getCittaByName(String nomeCitta) {
+        List<Citta> citta = this.getAllCitta();
+        Citta cittaDB = null;
+        for (Citta c : citta) {
+         if (c.getNome().equals(nomeCitta))
+             cittaDB = c;
+        }
+        return cittaDB;
+    }
+
+    @Override
     public Citta updateCitta(Citta nuovaCitta, String codice) {
         if (this.cittaRepository.existsById(codice)) {
             Citta c = this.getCittaByCodice(codice);

@@ -70,6 +70,7 @@ public class MenuServiceImpl implements MenuService{
             if (this.menuRepository.existsById(codiceMenu)) {
                 Menu menu = this.getMenuByCodice(codiceMenu);
                 menu.setSpecialita(codiceProdottoSpeciale);
+                menu.getCodiciProdotti().remove(codiceProdottoSpeciale);
                 this.updateMenu(menu, codiceMenu);
                 return menu;
             } else {

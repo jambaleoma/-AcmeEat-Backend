@@ -9,7 +9,7 @@ public interface MenuService {
 
     List<Menu> getAllMenu();
     Menu aggiungiMenu(Menu menu);
-    Menu aggiungiProdottoNelMenu(String codiceMenu, Prodotto ProdottoDaInserire);
+    Menu aggiungiProdottoNelMenu(String codiceMenu, Prodotto prodottoDaInserire);
     Menu selezionaProdottoSpecialeDelMenu(String codiceMenu, String codiceProdottoSpeciale);
     Menu eliminaProdottoNelMenu(String codiceMenu, String codiceProdottoDaEliminare);
     Menu getMenuByCodice(String codice);

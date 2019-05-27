@@ -30,9 +30,9 @@ public class AcmeHomeServiceImpl implements AcmeHomeService{
     public AcmeHome aggingiAzienda(AcmeHome acmeHome) { return acmeHomeRepository.save(acmeHome);}
 
     @Override
-    public List<Ristorante> getUtlimiQuindiciRistorantiInseriti() {
+    public List<String> getUtlimiQuindiciRistorantiInseriti() {
         AcmeHome azienda = this.getAzienda();
-        return  azienda.getQuindiciRistorantiRecenti();
+        return azienda.getCodiciQuindiciRistorantiRecenti();
     }
 
     @Override
@@ -52,9 +52,9 @@ public class AcmeHomeServiceImpl implements AcmeHomeService{
         if (this.ristoranteRepository.existsById(codiceRistorante)) {
             Ristorante ristorante = ristoranteRepository.findById(codiceRistorante).orElse(null);
             AcmeHome acmeHome = this.getAzienda();
-            acmeHome.getQuindiciRistorantiRecenti().add(0, ristorante);
-            if(acmeHome.getQuindiciRistorantiRecenti().size() > 15)
-                acmeHome.getQuindiciRistorantiRecenti().remove(acmeHome.getQuindiciRistorantiRecenti().size() - 1);
+            acmeHome.getCodiciQuindiciRistorantiRecenti().add(0, ristorante.getCodiceRistorante());
+            if(acmeHome.getCodiciQuindiciRistorantiRecenti().size() > 15)
+                acmeHome.getCodiciQuindiciRistorantiRecenti().remove(acmeHome.getCodiciQuindiciRistorantiRecenti().size() - 1);
             this.acmeHomeRepository.getCouchbaseOperations().update(acmeHome);
             return acmeHome;
         } else {

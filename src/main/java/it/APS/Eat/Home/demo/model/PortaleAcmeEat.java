@@ -7,6 +7,8 @@ import org.springframework.data.couchbase.core.mapping.Document;
 import org.springframework.data.couchbase.core.mapping.id.GeneratedValue;
 import org.springframework.data.couchbase.core.mapping.id.GenerationStrategy;
 
+import java.util.List;
+
 @Data
 @Document
 public class PortaleAcmeEat {
@@ -25,7 +27,22 @@ public class PortaleAcmeEat {
     private String codiceRistoranteCorrente;
 
     @Field
+    private String codiceMenuCorrente;
+
+    @Field
     private String codiceConsumatoreCorrente;
+
+    @Field
+    private String codiceOrdinazioneCorrente;
+
+    @Field
+    private String codiceProdottoCorrente;
+
+    @Field
+    private List<String> listaNomiCitta;
+
+    @Field
+    private List<String> listaCodiciRistoranti;
 
     @Field
     private String codiceAzienda;

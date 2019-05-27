@@ -1,20 +1,23 @@
 package it.APS.Eat.Home.demo.service.AcmehomePortale;
 
-import it.APS.Eat.Home.demo.Exception.IncorrectPasswordException;
 import it.APS.Eat.Home.demo.Exception.NotFoundException;
-import it.APS.Eat.Home.demo.Exception.PasswordLengthException;
 import it.APS.Eat.Home.demo.model.*;
-import it.APS.Eat.Home.demo.repository.AcmeHomeRepository;
-import it.APS.Eat.Home.demo.repository.DirettoreRepository;
 import it.APS.Eat.Home.demo.repository.PortaleAcmeEatRepository;
 import it.APS.Eat.Home.demo.service.AcmeHome.AcmeHomeService;
 import it.APS.Eat.Home.demo.service.Citta.CittaService;
 import it.APS.Eat.Home.demo.service.Consumatore.ConsumatoreService;
 import it.APS.Eat.Home.demo.service.Direttore.DirettoreService;
+import it.APS.Eat.Home.demo.service.Menu.MenuService;
+import it.APS.Eat.Home.demo.service.Ordinazione.OrdinazioneService;
+import it.APS.Eat.Home.demo.service.Prodotto.ProdottoService;
 import it.APS.Eat.Home.demo.service.Ristorante.RistoranteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 @Component("PortaleAcmeEatService")
@@ -33,10 +36,19 @@ public class PortaleAcmeEatServiceImpl implements PortaleAcmeEatService{
     private RistoranteService ristoranteService;
 
     @Autowired
+    private MenuService menuService;
+
+    @Autowired
     private DirettoreService direttoreService;
 
     @Autowired
     private CittaService cittaService;
+
+    @Autowired
+    private OrdinazioneService ordinazioneService;
+
+    @Autowired
+    private ProdottoService prodottoService;
 
     @Autowired
     private AcmeHomeService acmeHomeService;
@@ -130,9 +142,35 @@ public class PortaleAcmeEatServiceImpl implements PortaleAcmeEatService{
     }
 
     @Override
+    public Menu getMenuCorrente() {
+        PortaleAcmeEat portaleAcmeEat = this.getPortale();
+        return this.menuService.getMenuByCodice(portaleAcmeEat.getCodiceMenuCorrente());
+    }
+
+    @Override
+    public String setMenuCorrente(String codice) {
+        PortaleAcmeEat portale = this.getPortale();
+        if (codice == null) {
+            portale.setCodiceMenuCorrente(null);
+        } else {
+            Menu m = this.menuService.getMenuByCodice(codice);
+            if (m != null) {
+                portale.setCodiceMenuCorrente(m.getCodiceMenu());
+            } else {
+                throw new NotFoundException("Il Menù non Esiste");
+            }
+        }
+        this.portaleAcmehomeRepository.getCouchbaseOperations().update(portale);
+        return portale.getCodiceMenuCorrente();
+    }
+
+    @Override
     public Consumatore getConsumatoreCorrente() {
         PortaleAcmeEat portale = this.getPortale();
+        if (portale.getCodiceConsumatoreCorrente() != null)
         return this.consumatoreService.getConsumatoreByCodice(portale.getCodiceConsumatoreCorrente());
+        else
+            return null;
     }
 
     @Override
@@ -165,6 +203,169 @@ public class PortaleAcmeEatServiceImpl implements PortaleAcmeEatService{
     }
 
     @Override
+    public List<String> getCodiciCitta() {
+        PortaleAcmeEat portale = this.getPortale();
+        List<Citta> listaCitta = this.cittaService.getAllCitta();
+        if (listaCitta.size() > 0) {
+            List<String> nomiCitta = new ArrayList<>();
+            for (Citta c : listaCitta) {
+                nomiCitta.add(c.getNome());
+            }
+            portale.setListaNomiCitta(nomiCitta);
+        } else {
+            throw new NotFoundException("Nessuna Citta Presente");
+        }
+        this.portaleAcmehomeRepository.getCouchbaseOperations().update(portale);
+        return portale.getListaNomiCitta();
+    }
+
+    @Override
+    public List<String> setCodiciCitta(List<String> codiciCitta) {
+        PortaleAcmeEat portale = this.getPortale();
+        portale.setListaNomiCitta(codiciCitta);
+        this.portaleAcmehomeRepository.getCouchbaseOperations().update(portale);
+        return portale.getListaNomiCitta();
+    }
+
+    @Override
+    public List<Ristorante> getRistorantiInCitta(String nomeCitta) {
+        PortaleAcmeEat portale = this.getPortale();
+        Citta c = this.cittaService.getCittaByName(nomeCitta);
+        portale.setCodiceCittaCorrente(c.getCodiceCitta());
+        List<Ristorante> tuttiRistoranti = this.ristoranteService.getAllRistoranti();
+        List<String> listaCodiciRistorantiInCitta = new ArrayList<>();
+        for (Ristorante r : tuttiRistoranti) {
+            if (r.getCodiceCitta().equals(c.getCodiceCitta())) {
+                listaCodiciRistorantiInCitta.add(r.getCodiceRistorante());
+            }
+        }
+        if (listaCodiciRistorantiInCitta.size() > 0) {
+            portale.setListaCodiciRistoranti(listaCodiciRistorantiInCitta);
+        } else {
+            throw new NotFoundException("Nessun Ristorante Presente a " + nomeCitta);
+        }
+        this.portaleAcmehomeRepository.getCouchbaseOperations().update(portale);
+        return c.getRistoranti();
+    }
+
+    @Override
+    public List<String> setRistorantiInCitta(List<String> codiciRistoranti) {
+        PortaleAcmeEat portale = this.getPortale();
+        portale.setListaCodiciRistoranti(codiciRistoranti);
+        this.portaleAcmehomeRepository.getCouchbaseOperations().update(portale);
+        return portale.getListaNomiCitta();
+    }
+
+    @Override
+    public Ristorante selezionaRistorante(String codiceRistorante) {
+        PortaleAcmeEat portale = this.getPortale();
+        Ristorante ristorante = this.ristoranteService.getRistoranteByCodice(codiceRistorante);
+        Ordinazione ordinazione = new Ordinazione();
+        ordinazione.setRigheOrdinazione(new ArrayList<>());
+        ordinazione.setCodiceRistorante(codiceRistorante);
+        ordinazione.setCodiceConsumatore(portale.getCodiceConsumatoreCorrente());
+        this.ordinazioneService.aggiungiOrdinazione(ordinazione);
+        this.portaleAcmeEatService.setOrdinazioneCorrente(ordinazione.getCodiceOrdinazione());
+        this.portaleAcmeEatService.setRistoranteCorrente(codiceRistorante);
+        this.portaleAcmeEatService.setDirettoreCorrente(ristorante.getCodiceDirettore());
+        this.portaleAcmeEatService.setMenuCorrente(ristorante.getCodiceMenu());
+        return ristorante;
+    }
+
+    @Override
+    public Ordinazione getOrdinazioneCorrente() {
+        PortaleAcmeEat portaleAcmeEat = this.getPortale();
+        return this.ordinazioneService.getOrdinazioneByCodice(portaleAcmeEat.getCodiceMenuCorrente());
+    }
+
+    @Override
+    public String setOrdinazioneCorrente(String codice) {
+        PortaleAcmeEat portale = this.getPortale();
+        if (codice == null) {
+            portale.setCodiceOrdinazioneCorrente(null);
+        } else {
+            Ordinazione o = this.ordinazioneService.getOrdinazioneByCodice(codice);
+            if (o != null) {
+                portale.setCodiceOrdinazioneCorrente(o.getCodiceOrdinazione());
+            } else {
+                throw new NotFoundException("L'Ordinazione non Esiste");
+            }
+        }
+        this.portaleAcmehomeRepository.getCouchbaseOperations().update(portale);
+        return portale.getCodiceOrdinazioneCorrente();
+    }
+
+    @Override
+    public Prodotto getProdottoCorrente() {
+        PortaleAcmeEat portaleAcmeEat = this.getPortale();
+        return this.prodottoService.getProdottoByCodice(portaleAcmeEat.getCodiceProdottoCorrente());
+    }
+
+    @Override
+    public String setProdottoCorrente(String codice) {
+        PortaleAcmeEat portale = this.getPortale();
+        if (codice == null) {
+            portale.setCodiceProdottoCorrente(null);
+        } else {
+            Prodotto p = this.prodottoService.getProdottoByCodice(codice);
+            if (p != null) {
+                portale.setCodiceProdottoCorrente(p.getCodiceProdotto());
+            } else {
+                throw new NotFoundException("Il Prodotto non Esiste");
+            }
+        }
+        this.portaleAcmehomeRepository.getCouchbaseOperations().update(portale);
+        return portale.getCodiceProdottoCorrente();
+    }
+
+    @Override
+    public Prodotto aggiungiProdottoNellaOrdinazione(RigaOrdinazione rigaOrdinazione) {
+        PortaleAcmeEat portale = this.getPortale();
+        Prodotto p = this.prodottoService.getProdottoByCodice(rigaOrdinazione.getCodiceProdotto());
+        this.portaleAcmeEatService.setProdottoCorrente(p.getCodiceProdotto());
+        portale.setCodiceProdottoCorrente(p.getCodiceProdotto());
+        Ordinazione ordinazione = this.ordinazioneService.getOrdinazioneByCodice(portale.getCodiceOrdinazioneCorrente());
+        List<RigaOrdinazione> rigaOrdinazioneList = ordinazione.getRigheOrdinazione();
+        RigaOrdinazione ro = this.ordinazioneService.aggiungiRigaOrdinazione(p.getCodiceProdotto(), rigaOrdinazione);
+        rigaOrdinazioneList.add(ro);
+        ordinazione.setRigheOrdinazione(rigaOrdinazioneList);
+        this.ordinazioneService.updateOrdinazione(ordinazione, ordinazione.getCodiceOrdinazione());
+        return p;
+    }
+
+    @Override
+    public Ordinazione getTotaleOrdinazione() {
+        PortaleAcmeEat portale = this.getPortale();
+        Ordinazione ordinazioneCorrente = this.ordinazioneService.getOrdinazioneByCodice(portale.getCodiceOrdinazioneCorrente());
+        Float totaleOrdinazione = 0F;
+        for (RigaOrdinazione ro : ordinazioneCorrente.getRigheOrdinazione()) {
+            ro.setTotaleRiga(Float.parseFloat(this.prodottoService.getProdottoByCodice(ro.getCodiceProdotto()).getPrezzo()) * ro.getQuantita());
+            totaleOrdinazione += ro.getTotaleRiga();
+        }
+        ordinazioneCorrente.setTotale(totaleOrdinazione);
+        this.ordinazioneService.updateOrdinazione(ordinazioneCorrente, ordinazioneCorrente.getCodiceOrdinazione());
+        return ordinazioneCorrente;
+    }
+
+    @Override
+    public Ordinazione confermaOrdinazione(Ordinazione indirizzo) {
+        PortaleAcmeEat portale = this.portaleAcmeEatService.getPortale();
+        Ordinazione ordinazione = this.ordinazioneService.getOrdinazioneByCodice(portale.getCodiceOrdinazioneCorrente());
+        ordinazione.setIndirizzo(indirizzo.getIndirizzo());
+        ordinazione.setDataOra(new SimpleDateFormat("yyyyMMddHHmmss").format(Calendar.getInstance().getTime()));
+        this.ordinazioneService.updateOrdinazione(ordinazione, ordinazione.getCodiceOrdinazione());
+        Ristorante ristorante = this.ristoranteService.getRistoranteByCodice(portale.getCodiceRistoranteCorrente());
+        Consumatore consumatore = this.consumatoreService.getConsumatoreByCodice(portale.getCodiceConsumatoreCorrente());
+        List<String> listaCodiciOrdinazioniRistorante = ristorante.getCodiciOrdinazioni();
+        listaCodiciOrdinazioniRistorante.add(ordinazione.getCodiceOrdinazione());
+        this.ristoranteService.updateRistorante(ristorante, ristorante.getCodiceRistorante());
+        List<String> listaCodiciOrdinazioniConsumatore = consumatore.getCodiciOrdinazioni();
+        listaCodiciOrdinazioniConsumatore.add(ordinazione.getCodiceOrdinazione());
+        this.consumatoreService.updateConsumatore(consumatore, consumatore.getCodiceConsumatore());
+        return ordinazione;
+    }
+
+    @Override
     public void logoutDirettore() {
         if (this.portaleAcmeEatService.getDirettoreCorrente() != null) {
             this.portaleAcmeEatService.setRistoranteCorrente(null);
@@ -182,8 +383,13 @@ public class PortaleAcmeEatServiceImpl implements PortaleAcmeEatService{
             this.portaleAcmeEatService.setCittaCorrente(null);
             this.portaleAcmeEatService.setDirettoreCorrente(null);
             this.portaleAcmeEatService.setConsumatoreCorrente(null);
+            this.portaleAcmeEatService.setCodiciCitta(null);
+            this.portaleAcmeEatService.setRistorantiInCitta(null);
+            this.portaleAcmeEatService.setMenuCorrente(null);
+            this.portaleAcmeEatService.setOrdinazioneCorrente(null);
+            this.portaleAcmeEatService.setProdottoCorrente(null);
         } else {
-            throw new NotFoundException("Nessun Direttore Loggato Sul Portale");
+            throw new NotFoundException("Nessun Consumatore Loggato Sul Portale");
         }
     }
 

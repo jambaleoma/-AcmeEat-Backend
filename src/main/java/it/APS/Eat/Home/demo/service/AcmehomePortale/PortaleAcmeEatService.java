@@ -2,6 +2,8 @@ package it.APS.Eat.Home.demo.service.AcmehomePortale;
 
 import it.APS.Eat.Home.demo.model.*;
 
+import java.util.List;
+
 public interface PortaleAcmeEatService {
 
     PortaleAcmeEat creaNuovoPortale();
@@ -13,10 +15,24 @@ public interface PortaleAcmeEatService {
     String setCittaCorrente(String codice);
     Direttore getDirettoreCorrente();
     String setDirettoreCorrente(String codice);
+    Menu getMenuCorrente();
+    String setMenuCorrente(String codice);
     Consumatore getConsumatoreCorrente();
     String setConsumatoreCorrente(String codice);
     Direttore loginDirettore(Direttore direttore);
     Consumatore loginConsumatore(Consumatore consumatore);
+    List<String> getCodiciCitta();
+    List<String> setCodiciCitta(List<String> codiciCitta);
+    List<Ristorante> getRistorantiInCitta(String nomeCitta);
+    List<String> setRistorantiInCitta(List<String> codiciRistoranti);
+    Ristorante selezionaRistorante(String codiceRistorante);
+    Ordinazione getOrdinazioneCorrente();
+    String setOrdinazioneCorrente(String codice);
+    Prodotto getProdottoCorrente();
+    String setProdottoCorrente(String codice);
+    Prodotto aggiungiProdottoNellaOrdinazione(RigaOrdinazione rigaOrdinazione);
+    Ordinazione getTotaleOrdinazione();
+    Ordinazione confermaOrdinazione(Ordinazione indirizzo);
     void logoutDirettore();
     void logoutConsumatore();
 }

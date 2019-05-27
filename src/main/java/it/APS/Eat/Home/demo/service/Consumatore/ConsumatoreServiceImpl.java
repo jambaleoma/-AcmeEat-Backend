@@ -59,7 +59,7 @@ public class ConsumatoreServiceImpl implements ConsumatoreService {
            c.setNome(nuovoConsumatore.getNome());
            c.setCognome(nuovoConsumatore.getCognome());
            c.setCellulare(nuovoConsumatore.getCellulare());
-           c.setOrdinazioni(nuovoConsumatore.getOrdinazioni());
+           c.setCodiciOrdinazioni(nuovoConsumatore.getCodiciOrdinazioni());
            this.consumatoreRepository.getCouchbaseOperations().update(c);
            return c;
        } else {

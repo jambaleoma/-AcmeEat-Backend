@@ -24,12 +24,15 @@ public class Ordinazione {
     private String dataOra;
 
     @Field
-    private Integer totale;
+    private Float totale;
 
     @Field
     private List<RigaOrdinazione> righeOrdinazione;
 
     @Field
-    private Ristorante ristorante;
+    private String codiceRistorante;
+
+    @Field
+    private String codiceConsumatore;
 
 }

@@ -2,6 +2,8 @@ package it.APS.Eat.Home.demo.service.Ordinazione;
 
 import it.APS.Eat.Home.demo.Exception.NotFoundException;
 import it.APS.Eat.Home.demo.model.Ordinazione;
+import it.APS.Eat.Home.demo.model.Prodotto;
+import it.APS.Eat.Home.demo.model.RigaOrdinazione;
 import it.APS.Eat.Home.demo.repository.OrdinazioneRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -45,7 +47,8 @@ public class OrdinazioneServiceImpl implements OrdinazioneService{
             o.setDataOra(nuovaOrdinazione.getDataOra());
             o.setTotale(nuovaOrdinazione.getTotale());
             o.setRigheOrdinazione(nuovaOrdinazione.getRigheOrdinazione());
-            o.setRistorante(nuovaOrdinazione.getRistorante());
+            o.setCodiceRistorante(nuovaOrdinazione.getCodiceRistorante());
+            o.setCodiceOrdinazione(nuovaOrdinazione.getCodiceOrdinazione());
             this.ordinazioneRepository.getCouchbaseOperations().update(o);
             return o;
         } else {
@@ -62,5 +65,14 @@ public class OrdinazioneServiceImpl implements OrdinazioneService{
         } else {
             throw new NotFoundException("L'ordinazione Non Esiste");
         }
+    }
+
+    @Override
+    public RigaOrdinazione aggiungiRigaOrdinazione(String codiceProdotto, RigaOrdinazione rigaOrdinazione) {
+        RigaOrdinazione ro = new RigaOrdinazione();
+        ro.setQuantita(rigaOrdinazione.getQuantita());
+        ro.setNota(rigaOrdinazione.getNota());
+        ro.setCodiceProdotto(codiceProdotto);
+        return ro;
     }
 }

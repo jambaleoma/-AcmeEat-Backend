@@ -11,7 +11,7 @@ public interface AcmeHomeService {
 
     AcmeHome getAzienda();
     AcmeHome aggingiAzienda(AcmeHome acmeHome);
-    List<Ristorante> getUtlimiQuindiciRistorantiInseriti();
+    List<String> getUtlimiQuindiciRistorantiInseriti();
     List<Citta> getAllCitta();
     List<Direttore> getAllDirettori();
     AcmeHome addRistoranteToUltimi15(String codiceRistorante);

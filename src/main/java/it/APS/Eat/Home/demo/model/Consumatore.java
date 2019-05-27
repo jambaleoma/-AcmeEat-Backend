@@ -33,6 +33,6 @@ public class Consumatore {
     private String cellulare;
 
     @Field
-    private List<Ordinazione> ordinazioni;
+    private List<String> codiciOrdinazioni;
 
 }
