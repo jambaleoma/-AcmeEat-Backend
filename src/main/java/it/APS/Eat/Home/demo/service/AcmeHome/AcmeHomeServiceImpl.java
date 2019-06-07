@@ -2,13 +2,12 @@ package it.APS.Eat.Home.demo.service.AcmeHome;
 
 import it.APS.Eat.Home.demo.Exception.NotFoundException;
 import it.APS.Eat.Home.demo.model.AcmeHome;
-import it.APS.Eat.Home.demo.model.Citta;
-import it.APS.Eat.Home.demo.model.Direttore;
 import it.APS.Eat.Home.demo.model.Ristorante;
 import it.APS.Eat.Home.demo.repository.AcmeHomeRepository;
 import it.APS.Eat.Home.demo.repository.RistoranteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
 import java.util.List;
 
 @Component("AcmeHomeService")
@@ -27,31 +26,26 @@ public class AcmeHomeServiceImpl implements AcmeHomeService{
     }
 
     @Override
-    public AcmeHome aggingiAzienda(AcmeHome acmeHome) { return acmeHomeRepository.save(acmeHome);}
+    public AcmeHome aggiungiAzienda(AcmeHome acmeHome) { return acmeHomeRepository.save(acmeHome);}
 
     @Override
-    public List<String> getUtlimiQuindiciRistorantiInseriti() {
+    public List<String> getAllCitta() {
         AcmeHome azienda = this.getAzienda();
-        return azienda.getCodiciQuindiciRistorantiRecenti();
+        return azienda.getCodiciCitta();
     }
 
     @Override
-    public List<Citta> getAllCitta() {
+    public List<String> getAllDirettori() {
         AcmeHome azienda = this.getAzienda();
-        return azienda.getCitta();
+        return azienda.getCodiciDirettori();
     }
 
     @Override
-    public List<Direttore> getAllDirettori() {
-        AcmeHome azienda = this.getAzienda();
-        return azienda.getDirettori();
-    }
-
-    @Override
-    public AcmeHome addRistoranteToUltimi15(String codiceRistorante) {
+    public AcmeHome confermaInserimentoRistorante(String codiceRistorante) {
         if (this.ristoranteRepository.existsById(codiceRistorante)) {
             Ristorante ristorante = ristoranteRepository.findById(codiceRistorante).orElse(null);
             AcmeHome acmeHome = this.getAzienda();
+            acmeHome.getCodiciRistoranti().add(ristorante.getCodiceRistorante());
             acmeHome.getCodiciQuindiciRistorantiRecenti().add(0, ristorante.getCodiceRistorante());
             if(acmeHome.getCodiciQuindiciRistorantiRecenti().size() > 15)
                 acmeHome.getCodiciQuindiciRistorantiRecenti().remove(acmeHome.getCodiciQuindiciRistorantiRecenti().size() - 1);
@@ -62,5 +56,22 @@ public class AcmeHomeServiceImpl implements AcmeHomeService{
         }
     }
 
+    @Override
+    public List<String> getUtlimiQuindiciRistorantiInseriti() {
+        AcmeHome azienda = this.getAzienda();
+        return azienda.getCodiciQuindiciRistorantiRecenti();
+    }
+
+    @Override
+    public AcmeHome aggiornaAzienda(AcmeHome acmeHome) {
+            AcmeHome ah = this.getAzienda();
+            ah.setCodiciCitta(acmeHome.getCodiciCitta());
+            ah.setCodiciDirettori(acmeHome.getCodiciDirettori());
+            ah.setCodiciConsumatori(acmeHome.getCodiciConsumatori());
+            ah.setCodiciRistoranti(acmeHome.getCodiciRistoranti());
+            ah.setCodiciQuindiciRistorantiRecenti(acmeHome.getCodiciQuindiciRistorantiRecenti());
+            this.acmeHomeRepository.getCouchbaseOperations().update(ah);
+            return ah;
+    }
 
 }

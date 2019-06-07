@@ -1,7 +1,6 @@
 package it.APS.Eat.Home.demo.service.Ordinazione;
 
 import it.APS.Eat.Home.demo.model.Ordinazione;
-import it.APS.Eat.Home.demo.model.Prodotto;
 import it.APS.Eat.Home.demo.model.RigaOrdinazione;
 
 import java.util.List;

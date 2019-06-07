@@ -1,9 +1,6 @@
 package it.APS.Eat.Home.demo.controller;
 
 import it.APS.Eat.Home.demo.model.AcmeHome;
-import it.APS.Eat.Home.demo.model.Citta;
-import it.APS.Eat.Home.demo.model.Direttore;
-import it.APS.Eat.Home.demo.model.Ristorante;
 import it.APS.Eat.Home.demo.service.AcmeHome.AcmeHomeService;
 import it.APS.Eat.Home.demo.service.Citta.CittaService;
 import it.APS.Eat.Home.demo.service.Consumatore.ConsumatoreService;
@@ -39,10 +36,10 @@ public class AcmeHomeController {
     private PortaleAcmeEatController portaleAcmeEatController;
 
     @CrossOrigin
-    @PostMapping(value = "/aggingiAzienda")
+    @PostMapping(value = "/aggiungiAzienda")
     public ResponseEntity aggingiAzienda(@RequestBody AcmeHome acmeHome) {
         try {
-            acmeHomeService.aggingiAzienda(acmeHome);
+            acmeHomeService.aggiungiAzienda(acmeHome);
             return ResponseEntity.status(HttpStatus.OK).header("Inserimento Azienda", "--- OK --- Azienda Inserita Con Successo").body(acmeHome);
         } catch (Exception e) {
             throw e;
@@ -54,10 +51,6 @@ public class AcmeHomeController {
     public ResponseEntity getAzienda() {
         try {
             AcmeHome acmeHome = acmeHomeService.getAzienda();
-            acmeHome.setDirettori(direttoreService.getAllDirettori());
-            acmeHome.setCitta(cittaService.getAllCitta());
-            acmeHome.setRistoranti(ristoranteService.getAllRistoranti());
-            acmeHome.setConsumatori(consumatoreService.getAllConsumatori());
             return ResponseEntity.status(HttpStatus.OK).header("Azienda", "--- OK --- Azienda Trovata Con Successo").body(acmeHome);
         } catch (Exception e) {
             throw e;
@@ -68,8 +61,8 @@ public class AcmeHomeController {
     @GetMapping(value = "/getCitta")
     public ResponseEntity getCitta() {
         try {
-            List<Citta> citta = cittaService.getAllCitta();
-            return ResponseEntity.status(HttpStatus.OK).header("Lista delle Citta", "--- OK --- Lista delle Citta Trovata Con Successo").body(citta);
+            List<String> codiciCitta = acmeHomeService.getAllCitta();
+            return ResponseEntity.status(HttpStatus.OK).header("Lista delle Citta", "--- OK --- Lista delle Citta Trovata Con Successo").body(codiciCitta);
         } catch (Exception e) {
             throw e;
         }
@@ -79,8 +72,8 @@ public class AcmeHomeController {
     @GetMapping(value = "/getDirettori")
     public ResponseEntity getDirettori() {
         try {
-            List<Direttore> direttori = direttoreService.getAllDirettori();
-            return ResponseEntity.status(HttpStatus.OK).header("Lista dei Direttori", "--- OK --- Lista dei Direttori Trovata Con Successo").body(direttori);
+            List<String> codiciDirettori = acmeHomeService.getAllDirettori();
+            return ResponseEntity.status(HttpStatus.OK).header("Lista dei Direttori", "--- OK --- Lista dei Direttori Trovata Con Successo").body(codiciDirettori);
         } catch (Exception e) {
             throw e;
         }

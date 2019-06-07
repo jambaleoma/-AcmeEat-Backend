@@ -18,16 +18,16 @@ public class AcmeHome {
     private String codiceAzienda;
 
     @Field
-    private List<Citta> citta;
+    private List<String> codiciCitta;
 
     @Field
-    private List<Direttore> direttori;
+    private List<String> codiciDirettori;
 
     @Field
-    private List<Consumatore> consumatori;
+    private List<String> codiciConsumatori;
 
     @Field
-    private List<Ristorante> ristoranti;
+    private List<String> codiciRistoranti;
 
     @Field
     private List<String> codiciQuindiciRistorantiRecenti;

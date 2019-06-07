@@ -14,7 +14,6 @@ import it.APS.Eat.Home.demo.service.Ristorante.RistoranteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -55,8 +54,7 @@ public class PortaleAcmeEatServiceImpl implements PortaleAcmeEatService{
 
 
     @Override
-    public PortaleAcmeEat creaNuovoPortale() {
-        PortaleAcmeEat portaleAcmeEat = new PortaleAcmeEat();
+    public PortaleAcmeEat creaNuovoPortale(PortaleAcmeEat portaleAcmeEat) {
         portaleAcmeEat.setCodiceAzienda(this.acmeHomeService.getAzienda().getCodiceAzienda());
         return this.portaleAcmehomeRepository.save(portaleAcmeEat);
     }
@@ -65,11 +63,6 @@ public class PortaleAcmeEatServiceImpl implements PortaleAcmeEatService{
     public PortaleAcmeEat getPortale() {
         List<PortaleAcmeEat> listaPortali = (List<PortaleAcmeEat>) this.portaleAcmehomeRepository.findAll();
         return listaPortali.get(0);
-    }
-
-    @Override
-    public AcmeHome getAzienda() {
-        return this.acmeHomeService.getAzienda();
     }
 
     @Override
@@ -121,7 +114,10 @@ public class PortaleAcmeEatServiceImpl implements PortaleAcmeEatService{
     @Override
     public Direttore getDirettoreCorrente() {
         PortaleAcmeEat portale = this.getPortale();
-        return this.direttoreService.getDirettoreByCodice(portale.getCodiceDirettoreCorrente());
+        if (portale.getCodiceDirettoreCorrente() != null)
+            return this.direttoreService.getDirettoreByCodice(portale.getCodiceDirettoreCorrente());
+        else
+            return null;
     }
 
     @Override
@@ -168,7 +164,7 @@ public class PortaleAcmeEatServiceImpl implements PortaleAcmeEatService{
     public Consumatore getConsumatoreCorrente() {
         PortaleAcmeEat portale = this.getPortale();
         if (portale.getCodiceConsumatoreCorrente() != null)
-        return this.consumatoreService.getConsumatoreByCodice(portale.getCodiceConsumatoreCorrente());
+            return this.consumatoreService.getConsumatoreByCodice(portale.getCodiceConsumatoreCorrente());
         else
             return null;
     }
@@ -203,35 +199,22 @@ public class PortaleAcmeEatServiceImpl implements PortaleAcmeEatService{
     }
 
     @Override
-    public List<String> getCodiciCitta() {
-        PortaleAcmeEat portale = this.getPortale();
+    public List<String> getNomiCitta() {
         List<Citta> listaCitta = this.cittaService.getAllCitta();
+        List<String> nomiCitta = new ArrayList<>();
         if (listaCitta.size() > 0) {
-            List<String> nomiCitta = new ArrayList<>();
             for (Citta c : listaCitta) {
                 nomiCitta.add(c.getNome());
             }
-            portale.setListaNomiCitta(nomiCitta);
         } else {
             throw new NotFoundException("Nessuna Citta Presente");
         }
-        this.portaleAcmehomeRepository.getCouchbaseOperations().update(portale);
-        return portale.getListaNomiCitta();
-    }
-
-    @Override
-    public List<String> setCodiciCitta(List<String> codiciCitta) {
-        PortaleAcmeEat portale = this.getPortale();
-        portale.setListaNomiCitta(codiciCitta);
-        this.portaleAcmehomeRepository.getCouchbaseOperations().update(portale);
-        return portale.getListaNomiCitta();
+        return nomiCitta;
     }
 
     @Override
     public List<Ristorante> getRistorantiInCitta(String nomeCitta) {
-        PortaleAcmeEat portale = this.getPortale();
         Citta c = this.cittaService.getCittaByName(nomeCitta);
-        portale.setCodiceCittaCorrente(c.getCodiceCitta());
         List<Ristorante> tuttiRistoranti = this.ristoranteService.getAllRistoranti();
         List<String> listaCodiciRistorantiInCitta = new ArrayList<>();
         for (Ristorante r : tuttiRistoranti) {
@@ -239,21 +222,10 @@ public class PortaleAcmeEatServiceImpl implements PortaleAcmeEatService{
                 listaCodiciRistorantiInCitta.add(r.getCodiceRistorante());
             }
         }
-        if (listaCodiciRistorantiInCitta.size() > 0) {
-            portale.setListaCodiciRistoranti(listaCodiciRistorantiInCitta);
-        } else {
+        if (listaCodiciRistorantiInCitta.size() == 0) {
             throw new NotFoundException("Nessun Ristorante Presente a " + nomeCitta);
         }
-        this.portaleAcmehomeRepository.getCouchbaseOperations().update(portale);
         return c.getRistoranti();
-    }
-
-    @Override
-    public List<String> setRistorantiInCitta(List<String> codiciRistoranti) {
-        PortaleAcmeEat portale = this.getPortale();
-        portale.setListaCodiciRistoranti(codiciRistoranti);
-        this.portaleAcmehomeRepository.getCouchbaseOperations().update(portale);
-        return portale.getListaNomiCitta();
     }
 
     @Override
@@ -369,6 +341,7 @@ public class PortaleAcmeEatServiceImpl implements PortaleAcmeEatService{
     public void logoutDirettore() {
         if (this.portaleAcmeEatService.getDirettoreCorrente() != null) {
             this.portaleAcmeEatService.setRistoranteCorrente(null);
+            this.portaleAcmeEatService.setMenuCorrente(null);
             this.portaleAcmeEatService.setCittaCorrente(null);
             this.portaleAcmeEatService.setDirettoreCorrente(null);
         } else {
@@ -383,8 +356,6 @@ public class PortaleAcmeEatServiceImpl implements PortaleAcmeEatService{
             this.portaleAcmeEatService.setCittaCorrente(null);
             this.portaleAcmeEatService.setDirettoreCorrente(null);
             this.portaleAcmeEatService.setConsumatoreCorrente(null);
-            this.portaleAcmeEatService.setCodiciCitta(null);
-            this.portaleAcmeEatService.setRistorantiInCitta(null);
             this.portaleAcmeEatService.setMenuCorrente(null);
             this.portaleAcmeEatService.setOrdinazioneCorrente(null);
             this.portaleAcmeEatService.setProdottoCorrente(null);

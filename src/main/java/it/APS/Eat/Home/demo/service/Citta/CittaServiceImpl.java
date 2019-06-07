@@ -1,10 +1,12 @@
 package it.APS.Eat.Home.demo.service.Citta;
 
 import it.APS.Eat.Home.demo.Exception.NotFoundException;
+import it.APS.Eat.Home.demo.model.AcmeHome;
 import it.APS.Eat.Home.demo.model.Citta;
 import it.APS.Eat.Home.demo.model.Ristorante;
 import it.APS.Eat.Home.demo.repository.CittaRepository;
 import it.APS.Eat.Home.demo.repository.RistoranteRepository;
+import it.APS.Eat.Home.demo.service.AcmeHome.AcmeHomeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -12,6 +14,9 @@ import java.util.List;
 
 @Component("CittaService")
 public class CittaServiceImpl implements CittaService {
+
+    @Autowired
+    private AcmeHomeService acmeHomeService;
 
     @Autowired
     private CittaRepository cittaRepository;
@@ -30,7 +35,12 @@ public class CittaServiceImpl implements CittaService {
 
     @Override
     public Citta aggiungiCitta(Citta citta) {
-        return cittaRepository.save(citta);
+        Citta c = cittaRepository.save(citta);
+        AcmeHome acmeHome = this.acmeHomeService.getAzienda();
+        List<String> codiciCittaRegistrate = acmeHome.getCodiciCitta();
+        codiciCittaRegistrate.add(c.getCodiceCitta());
+        this.acmeHomeService.aggiornaAzienda(acmeHome);
+        return c;
     }
 
     @Override
@@ -70,6 +80,10 @@ public class CittaServiceImpl implements CittaService {
     public Citta deleteCittaByCodice(String codice) {
         if (this.cittaRepository.existsById(codice)) {
             Citta c = this.getCittaByCodice(codice);
+            AcmeHome acmeHome = this.acmeHomeService.getAzienda();
+            List<String> codiciCittaRegistrate = acmeHome.getCodiciCitta();
+            codiciCittaRegistrate.remove(c.getCodiceCitta());
+            this.acmeHomeService.aggiornaAzienda(acmeHome);
             this.cittaRepository.delete(c);
             return c;
         } else {

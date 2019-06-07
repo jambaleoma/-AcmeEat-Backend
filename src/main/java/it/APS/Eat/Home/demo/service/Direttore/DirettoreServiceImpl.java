@@ -2,11 +2,12 @@ package it.APS.Eat.Home.demo.service.Direttore;
 
 import it.APS.Eat.Home.demo.Exception.IncorrectPasswordException;
 import it.APS.Eat.Home.demo.Exception.NotFoundException;
-import it.APS.Eat.Home.demo.Exception.PasswordLengthException;
+import it.APS.Eat.Home.demo.model.AcmeHome;
 import it.APS.Eat.Home.demo.model.Direttore;
 import it.APS.Eat.Home.demo.model.Ristorante;
 import it.APS.Eat.Home.demo.repository.DirettoreRepository;
 import it.APS.Eat.Home.demo.repository.RistoranteRepository;
+import it.APS.Eat.Home.demo.service.AcmeHome.AcmeHomeService;
 import it.APS.Eat.Home.demo.service.AcmehomePortale.PortaleAcmeEatService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -15,6 +16,9 @@ import java.util.List;
 
 @Component("DirettoreService")
 public class DirettoreServiceImpl implements DirettoreService{
+
+    @Autowired
+    private AcmeHomeService acmeHomeService;
 
     @Autowired
     private DirettoreRepository direttoreRepository;
@@ -36,7 +40,12 @@ public class DirettoreServiceImpl implements DirettoreService{
 
     @Override
     public Direttore aggiungiDirettore(Direttore direttore) {
-        return direttoreRepository.save(direttore);
+        Direttore d = direttoreRepository.save(direttore);
+        AcmeHome acmeHome = this.acmeHomeService.getAzienda();
+        List<String> codiciDirettoriRegistrati = acmeHome.getCodiciDirettori();
+        codiciDirettoriRegistrati.add(d.getCodiceDirettore());
+        this.acmeHomeService.aggiornaAzienda(acmeHome);
+        return d;
     }
 
     @Override
@@ -65,9 +74,17 @@ public class DirettoreServiceImpl implements DirettoreService{
 
     @Override
     public Direttore deleteDirettoreByCodice(String codice) {
-        Direttore d = this.getDirettoreByCodice(codice);
-        this.direttoreRepository.delete(d);
-        return d;
+        if (this.direttoreRepository.existsById(codice)) {
+            Direttore d = this.getDirettoreByCodice(codice);
+            AcmeHome acmeHome = this.acmeHomeService.getAzienda();
+            List<String> codiciDirettoriRegistrati = acmeHome.getCodiciDirettori();
+            codiciDirettoriRegistrati.remove(d.getCodiceDirettore());
+            this.acmeHomeService.aggiornaAzienda(acmeHome);
+            this.direttoreRepository.delete(d);
+            return d;
+        } else {
+            throw new NotFoundException("Il Direttore non Esiste");
+        }
     }
 
     @Override

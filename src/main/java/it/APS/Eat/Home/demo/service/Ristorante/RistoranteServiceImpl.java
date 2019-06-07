@@ -42,6 +42,7 @@ public class RistoranteServiceImpl implements RistoranteService{
         ristorante.setCodiceMenu(m.getCodiceMenu());
         Ristorante r = this.ristoranteRepository.save(ristorante);
         this.portaleAcmeEatService.setRistoranteCorrente(r.getCodiceRistorante());
+        this.portaleAcmeEatService.setMenuCorrente(m.getCodiceMenu());
         this.portaleAcmeEatService.setCittaCorrente(ristorante.getCodiceCitta());
         return r;
     }

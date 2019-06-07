@@ -2,9 +2,11 @@ package it.APS.Eat.Home.demo.service.Menu;
 
 import it.APS.Eat.Home.demo.Exception.NotFoundException;
 import it.APS.Eat.Home.demo.model.Menu;
+import it.APS.Eat.Home.demo.model.PortaleAcmeEat;
 import it.APS.Eat.Home.demo.model.Prodotto;
 import it.APS.Eat.Home.demo.repository.MenuRepository;
 import it.APS.Eat.Home.demo.repository.ProdottoRepository;
+import it.APS.Eat.Home.demo.service.AcmehomePortale.PortaleAcmeEatService;
 import it.APS.Eat.Home.demo.service.Prodotto.ProdottoServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -24,6 +26,9 @@ public class MenuServiceImpl implements MenuService{
     @Autowired
     private ProdottoServiceImpl prodottoService;
 
+    @Autowired
+    private PortaleAcmeEatService portaleAcmeEatService;
+
     @Override
     public List<Menu> getAllMenu() {
         List<Menu> menu = (List<Menu>) menuRepository.findAll();
@@ -36,16 +41,17 @@ public class MenuServiceImpl implements MenuService{
     @Override
     public Menu aggiungiMenu(Menu menu) {
         menu.setCodiciProdotti(new ArrayList<>());
-        menu.setIsListaProdottiCompleta(false);
         return menuRepository.save(menu);
     }
 
     @Override
-    public Menu aggiungiProdottoNelMenu(String codiceMenu, Prodotto prodottoDaInserire) {
-        if (this.menuRepository.existsById(codiceMenu)) {
+    public Menu aggiungiProdottoNelMenu(Prodotto prodottoDaInserire) {
+        PortaleAcmeEat portale = this.portaleAcmeEatService.getPortale();
+        Menu menu = this.getMenuByCodice(portale.getCodiceMenuCorrente());
+        if (this.menuRepository.existsById(menu.getCodiceMenu())) {
             Prodotto prodottoSalvato = this.prodottoService.aggiungiProdotto(prodottoDaInserire);
             if (this.prodottoRepository.existsById(prodottoSalvato.getCodiceProdotto())) {
-                Menu menu = this.getMenuByCodice(codiceMenu);
+
                 List<String> listaCodiciProdotti;
                 if (menu.getCodiciProdotti() != null) {
                     listaCodiciProdotti = new ArrayList<>(menu.getCodiciProdotti());
@@ -54,7 +60,7 @@ public class MenuServiceImpl implements MenuService{
                 }
                 listaCodiciProdotti.add(prodottoSalvato.getCodiceProdotto());
                 menu.setCodiciProdotti(listaCodiciProdotti);
-                this.updateMenu(menu, codiceMenu);
+                this.updateMenu(menu, menu.getCodiceMenu());
                 return menu;
             } else {
                 throw new NotFoundException("Il Prodotto non Esiste");
@@ -65,13 +71,14 @@ public class MenuServiceImpl implements MenuService{
     }
 
     @Override
-    public Menu selezionaProdottoSpecialeDelMenu(String codiceMenu, String codiceProdottoSpeciale) {
+    public Menu selezionaProdottoSpecialeDelMenu(String codiceProdottoSpeciale) {
         if (this.prodottoRepository.existsById(codiceProdottoSpeciale)) {
-            if (this.menuRepository.existsById(codiceMenu)) {
-                Menu menu = this.getMenuByCodice(codiceMenu);
+            PortaleAcmeEat portale = this.portaleAcmeEatService.getPortale();
+            Menu menu = this.getMenuByCodice(portale.getCodiceMenuCorrente());
+            if (this.menuRepository.existsById(menu.getCodiceMenu())) {
                 menu.setSpecialita(codiceProdottoSpeciale);
                 menu.getCodiciProdotti().remove(codiceProdottoSpeciale);
-                this.updateMenu(menu, codiceMenu);
+                this.updateMenu(menu, menu.getCodiceMenu());
                 return menu;
             } else {
                 throw new NotFoundException("Il Menu non Esiste");
@@ -115,7 +122,6 @@ public class MenuServiceImpl implements MenuService{
             Menu m = this.getMenuByCodice(codice);
             m.setCodiciProdotti(nuovoMenu.getCodiciProdotti());
             m.setSpecialita(nuovoMenu.getSpecialita());
-            m.setIsListaProdottiCompleta(nuovoMenu.getIsListaProdottiCompleta());
             this.menuRepository.getCouchbaseOperations().update(m);
             return m;
         } else {
@@ -129,16 +135,5 @@ public class MenuServiceImpl implements MenuService{
         this.menuRepository.delete(m);
         return m;
     }
-
-    @Override
-    public Menu terminaInserimento(String codice) {
-        if (this.menuRepository.existsById(codice)) {
-            Menu m = this.getMenuByCodice(codice);
-            m.setIsListaProdottiCompleta(true);
-            this.updateMenu(m, codice);
-            return m;
-        } else {
-            throw new NotFoundException("Il Menu non Esiste");
-        }
-    }
+    
 }

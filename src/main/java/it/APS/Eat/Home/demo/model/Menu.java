@@ -23,7 +23,4 @@ public class Menu {
     @Field
     private List<String> codiciProdotti;
 
-    @Field
-    private Boolean isListaProdottiCompleta;
-
 }

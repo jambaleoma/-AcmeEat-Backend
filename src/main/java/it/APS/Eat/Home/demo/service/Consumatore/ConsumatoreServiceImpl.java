@@ -2,8 +2,10 @@ package it.APS.Eat.Home.demo.service.Consumatore;
 
 import it.APS.Eat.Home.demo.Exception.IncorrectPasswordException;
 import it.APS.Eat.Home.demo.Exception.NotFoundException;
+import it.APS.Eat.Home.demo.model.AcmeHome;
 import it.APS.Eat.Home.demo.model.Consumatore;
 import it.APS.Eat.Home.demo.repository.ConsumatoreRepository;
+import it.APS.Eat.Home.demo.service.AcmeHome.AcmeHomeService;
 import it.APS.Eat.Home.demo.service.AcmehomePortale.PortaleAcmeEatService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -19,6 +21,10 @@ public class ConsumatoreServiceImpl implements ConsumatoreService {
     @Autowired
     private PortaleAcmeEatService portaleAcmeEatService;
 
+    @Autowired
+    private AcmeHomeService acmeHomeService;
+
+
     @Override
     public List<Consumatore> getAllConsumatori() {
         List<Consumatore> consumatori = (List<Consumatore>) consumatoreRepository.findAll();
@@ -30,7 +36,12 @@ public class ConsumatoreServiceImpl implements ConsumatoreService {
 
     @Override
     public Consumatore aggiungiConsumatore(Consumatore consumatore) {
-        return consumatoreRepository.save(consumatore);
+        Consumatore c = consumatoreRepository.save(consumatore);
+        AcmeHome acmeHome = this.acmeHomeService.getAzienda();
+        List<String> codiciConsumatoriRegistrati = acmeHome.getCodiciConsumatori();
+        codiciConsumatoriRegistrati.add(c.getCodiceConsumatore());
+        this.acmeHomeService.aggiornaAzienda(acmeHome);
+        return c;
     }
 
     @Override
@@ -69,9 +80,18 @@ public class ConsumatoreServiceImpl implements ConsumatoreService {
 
     @Override
     public Consumatore deleteConsumatoreByCodice(String codice) {
-        Consumatore c = this.getConsumatoreByCodice(codice);
-        this.consumatoreRepository.delete(c);
-        return c;
+
+        if (this.consumatoreRepository.existsById(codice)) {
+            Consumatore c = this.getConsumatoreByCodice(codice);
+            AcmeHome acmeHome = this.acmeHomeService.getAzienda();
+            List<String> codiciConsumatoriRegistrati = acmeHome.getCodiciConsumatori();
+            codiciConsumatoriRegistrati.remove(c.getCodiceConsumatore());
+            this.acmeHomeService.aggiornaAzienda(acmeHome);
+            this.consumatoreRepository.delete(c);
+            return c;
+        } else {
+            throw new NotFoundException("Il Consumatore non Esiste");
+        }
     }
 
     @Override

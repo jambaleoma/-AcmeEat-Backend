@@ -6,9 +6,8 @@ import java.util.List;
 
 public interface PortaleAcmeEatService {
 
-    PortaleAcmeEat creaNuovoPortale();
+    PortaleAcmeEat creaNuovoPortale(PortaleAcmeEat portaleAcmeEat);
     PortaleAcmeEat getPortale();
-    AcmeHome getAzienda();
     Ristorante getRistoranteCorrente();
     String setRistoranteCorrente(String codice);
     Citta getCittaCorrente();
@@ -21,10 +20,8 @@ public interface PortaleAcmeEatService {
     String setConsumatoreCorrente(String codice);
     Direttore loginDirettore(Direttore direttore);
     Consumatore loginConsumatore(Consumatore consumatore);
-    List<String> getCodiciCitta();
-    List<String> setCodiciCitta(List<String> codiciCitta);
+    List<String> getNomiCitta();
     List<Ristorante> getRistorantiInCitta(String nomeCitta);
-    List<String> setRistorantiInCitta(List<String> codiciRistoranti);
     Ristorante selezionaRistorante(String codiceRistorante);
     Ordinazione getOrdinazioneCorrente();
     String setOrdinazioneCorrente(String codice);
