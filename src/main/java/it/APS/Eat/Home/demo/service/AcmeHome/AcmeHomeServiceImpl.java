@@ -8,6 +8,8 @@ import it.APS.Eat.Home.demo.repository.RistoranteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component("AcmeHomeService")
@@ -20,8 +22,12 @@ public class AcmeHomeServiceImpl implements AcmeHomeService{
     private RistoranteRepository ristoranteRepository;
 
     @Override
+    @NotNull
     public AcmeHome getAzienda() {
         List<AcmeHome> aziende = (List<AcmeHome>) this.acmeHomeRepository.findAll();
+        if (aziende == null) {
+            aziende = new ArrayList<>();
+         }
         return aziende.get(0);
     }
 
@@ -41,11 +47,17 @@ public class AcmeHomeServiceImpl implements AcmeHomeService{
     }
 
     @Override
-    public AcmeHome confermaInserimentoRistorante(String codiceRistorante) {
+    @NotNull public AcmeHome confermaInserimentoRistorante(String codiceRistorante) {
         if (this.ristoranteRepository.existsById(codiceRistorante)) {
             Ristorante ristorante = ristoranteRepository.findById(codiceRistorante).orElse(null);
             AcmeHome acmeHome = this.getAzienda();
-            acmeHome.getCodiciRistoranti().add(ristorante.getCodiceRistorante());
+            if (acmeHome.getCodiciRistoranti() == null) {
+                List<String> listaCodiciRistorante = new ArrayList<>();
+                listaCodiciRistorante.add(ristorante.getCodiceRistorante());
+                acmeHome.setCodiciRistoranti(listaCodiciRistorante);
+            } else {
+                acmeHome.getCodiciRistoranti().add(ristorante.getCodiceRistorante());
+            }
             acmeHome.getCodiciQuindiciRistorantiRecenti().add(0, ristorante.getCodiceRistorante());
             if(acmeHome.getCodiciQuindiciRistorantiRecenti().size() > 15)
                 acmeHome.getCodiciQuindiciRistorantiRecenti().remove(acmeHome.getCodiciQuindiciRistorantiRecenti().size() - 1);
