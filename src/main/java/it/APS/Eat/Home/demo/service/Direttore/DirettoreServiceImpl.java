@@ -12,7 +12,7 @@ import it.APS.Eat.Home.demo.service.AcmehomePortale.PortaleAcmeEatService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
+import java.util.*;
 
 @Component("DirettoreService")
 public class DirettoreServiceImpl implements DirettoreService{
@@ -93,8 +93,35 @@ public class DirettoreServiceImpl implements DirettoreService{
             Ristorante ristorante = ristoranteRepository.findById(codiceRistorante).orElse(null);
             if (this.direttoreRepository.existsById(codiceDirettore)) {
                 Direttore direttore = this.direttoreRepository.findById(codiceDirettore).orElse(null);
-                direttore.getRistoranti().add(ristorante);
+                assert direttore != null;
+                assert ristorante != null;
+                if (Objects.isNull(direttore.getRistoranti())) {
+                    Set<String> newSet = new HashSet<>();
+                    direttore.setRistoranti(newSet);
+                }
+                direttore.getRistoranti().add(ristorante.getCodiceRistorante());
                 this.updateDirettore(direttore, direttore.getCodiceDirettore());
+                return direttore;
+            } else {
+                throw new NotFoundException("Il Direttore non Esiste");
+            }
+        } else {
+            throw new NotFoundException("Il Ristorante non Esiste");
+        }
+    }
+
+    @Override
+    public Direttore disattivaRistorante(String codiceRistorante, String codiceDirettore) {
+        if (this.ristoranteRepository.existsById(codiceRistorante)) {
+            Ristorante ristorante = ristoranteRepository.findById(codiceRistorante).orElse(null);
+            if (this.direttoreRepository.existsById(codiceDirettore)) {
+                Direttore direttore = this.direttoreRepository.findById(codiceDirettore).orElse(null);
+                assert direttore != null;
+                assert ristorante != null;
+                if (Objects.nonNull(direttore.getRistoranti())) {
+                    direttore.getRistoranti().remove(ristorante.getCodiceRistorante());
+                    this.updateDirettore(direttore, direttore.getCodiceDirettore());
+                }
                 return direttore;
             } else {
                 throw new NotFoundException("Il Direttore non Esiste");

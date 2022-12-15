@@ -7,7 +7,7 @@ import org.springframework.data.couchbase.core.mapping.Document;
 import org.springframework.data.couchbase.core.mapping.id.GeneratedValue;
 import org.springframework.data.couchbase.core.mapping.id.GenerationStrategy;
 
-import java.util.List;
+import java.util.Set;
 
 @Data
 @Document
@@ -21,6 +21,9 @@ public class Citta {
     private String nome;
 
     @Field
-    private List<Ristorante> ristoranti;
+    private Set<String> ristoranti;
+
+    @Field
+    private  String codice;
 
 }

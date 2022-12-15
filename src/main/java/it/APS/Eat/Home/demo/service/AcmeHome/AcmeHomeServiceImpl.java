@@ -69,6 +69,24 @@ public class AcmeHomeServiceImpl implements AcmeHomeService{
     }
 
     @Override
+    @NotNull public AcmeHome disattivaRistorante(String codiceRistorante) {
+        if (this.ristoranteRepository.existsById(codiceRistorante)) {
+            Ristorante ristorante = ristoranteRepository.findById(codiceRistorante).orElse(null);
+            AcmeHome acmeHome = this.getAzienda();
+            if (acmeHome.getCodiciRistoranti().size() > 0 && acmeHome.getCodiciRistoranti().contains(ristorante.getCodiceRistorante())) {
+                acmeHome.getCodiciRistoranti().remove(ristorante.getCodiceRistorante());
+            }
+            if (acmeHome.getCodiciQuindiciRistorantiRecenti().size() > 0 && acmeHome.getCodiciQuindiciRistorantiRecenti().contains(ristorante.getCodiceRistorante())) {
+                acmeHome.getCodiciQuindiciRistorantiRecenti().remove(ristorante.getCodiceRistorante());
+            }
+            this.acmeHomeRepository.getCouchbaseOperations().update(acmeHome);
+            return acmeHome;
+        } else {
+            throw new NotFoundException("Il Ristorante non Esiste");
+        }
+    }
+
+    @Override
     public List<String> getUtlimiQuindiciRistorantiInseriti() {
         AcmeHome azienda = this.getAzienda();
         return azienda.getCodiciQuindiciRistorantiRecenti();

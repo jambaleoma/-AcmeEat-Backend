@@ -11,6 +11,7 @@ public interface AcmeHomeService {
     List<String> getAllCitta();
     List<String> getAllDirettori();
     AcmeHome confermaInserimentoRistorante(String codiceRistorante);
+    AcmeHome disattivaRistorante(String codiceRistorante);
     List<String> getUtlimiQuindiciRistorantiInseriti();
     AcmeHome aggiornaAzienda(AcmeHome acmeHome);
 }

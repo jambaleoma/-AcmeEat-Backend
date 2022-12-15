@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Component("MenuService")
 public class MenuServiceImpl implements MenuService{
@@ -71,20 +72,14 @@ public class MenuServiceImpl implements MenuService{
     }
 
     @Override
-    public Menu selezionaProdottoSpecialeDelMenu(String codiceProdottoSpeciale) {
-        if (this.prodottoRepository.existsById(codiceProdottoSpeciale)) {
-            PortaleAcmeEat portale = this.portaleAcmeEatService.getPortale();
-            Menu menu = this.getMenuByCodice(portale.getCodiceMenuCorrente());
-            if (this.menuRepository.existsById(menu.getCodiceMenu())) {
-                menu.setSpecialita(codiceProdottoSpeciale);
-                // menu.getCodiciProdotti().remove(codiceProdottoSpeciale);
-                this.updateMenu(menu, menu.getCodiceMenu());
-                return menu;
-            } else {
-                throw new NotFoundException("Il Menu non Esiste");
-            }
+    public Menu selezionaProdottoSpecialeDelMenu(String codiceMenu, String codiceProdottoSpeciale) {
+        Menu menu = this.getMenuByCodice(codiceMenu);
+        if (this.menuRepository.existsById(menu.getCodiceMenu())) {
+            menu.setSpecialita(codiceProdottoSpeciale);
+            this.updateMenu(menu, menu.getCodiceMenu());
+            return menu;
         } else {
-            throw new NotFoundException("Il Prodotto non Esiste");
+            throw new NotFoundException("Il Menu non Esiste");
         }
     }
 
@@ -114,6 +109,21 @@ public class MenuServiceImpl implements MenuService{
     @Override
     public Menu getMenuByCodice(String codice) {
         return menuRepository.findById(codice).orElse(null);
+    }
+
+    @Override
+    public ArrayList<Prodotto> getAllProductsByMenu(String codice) {
+        ArrayList<Prodotto> prodotti = new ArrayList<>();
+        Menu m = menuRepository.findById(codice).orElse(null);
+        if (Objects.nonNull(m) && m.getCodiciProdotti().size() > 0) {
+            for (String codiceProdotto : m.getCodiciProdotti()) {
+                Prodotto p = this.prodottoService.getProdottoByCodice(codiceProdotto);
+                if (Objects.nonNull(p)) {
+                    prodotti.add(p);
+                }
+            }
+        }
+        return prodotti;
     }
 
     @Override

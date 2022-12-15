@@ -13,5 +13,6 @@ public interface CittaService {
     Citta updateCitta(Citta nuovaCitta, String codice);
     Citta deleteCittaByCodice(String codice);
     Citta confermaInserimentoRistorante(String codiceRistorante);
+    Citta disattivaRistorante(String codiceRistorante);
 
 }

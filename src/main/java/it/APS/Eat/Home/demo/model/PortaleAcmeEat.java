@@ -35,7 +35,4 @@ public class PortaleAcmeEat {
 
     @Field
     private String codiceProdottoCorrente;
-
-    @Field
-    private String codiceAzienda;
 }

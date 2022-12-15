@@ -11,6 +11,7 @@ import it.APS.Eat.Home.demo.service.Menu.MenuService;
 import it.APS.Eat.Home.demo.service.Ordinazione.OrdinazioneService;
 import it.APS.Eat.Home.demo.service.Prodotto.ProdottoService;
 import it.APS.Eat.Home.demo.service.Ristorante.RistoranteService;
+import it.APS.Eat.Home.demo.service.Utilities.UtilitiesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -18,6 +19,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Set;
 
 @Component("PortaleAcmeEatService")
 public class PortaleAcmeEatServiceImpl implements PortaleAcmeEatService{
@@ -52,10 +54,11 @@ public class PortaleAcmeEatServiceImpl implements PortaleAcmeEatService{
     @Autowired
     private AcmeHomeService acmeHomeService;
 
+    @Autowired
+    private UtilitiesService utilitiesService;
 
     @Override
     public PortaleAcmeEat creaNuovoPortale(PortaleAcmeEat portaleAcmeEat) {
-        portaleAcmeEat.setCodiceAzienda(this.acmeHomeService.getAzienda().getCodiceAzienda());
         return this.portaleAcmehomeRepository.save(portaleAcmeEat);
     }
 
@@ -100,11 +103,22 @@ public class PortaleAcmeEatServiceImpl implements PortaleAcmeEatService{
         if (codice == null) {
             portale.setCodiceCittaCorrente(null);
         } else {
-            Citta c = this.cittaService.getCittaByCodice(codice);
-            if (c != null) {
-                portale.setCodiceCittaCorrente(c.getCodiceCitta());
-            } else {
-                throw new NotFoundException("La Città non Esiste");
+            try {
+                Citta c = this.cittaService.getCittaByCodice(codice);
+                if (c != null) {
+                    if (c.getCodiceCitta() != null) {
+                        portale.setCodiceCittaCorrente(c.getCodiceCitta());
+                    } else {
+                        portale.setCodiceCittaCorrente(c.getCodice());
+                    }
+                }
+            } catch (Exception e) {
+                Utilities utilities = this.utilitiesService.getUtilities();
+                for (Citta c1 : utilities.getListacitta()) {
+                    if (c1.getCodice().equals(codice)) {
+                        portale.setCodiceCittaCorrente(c1.getCodice());
+                    }
+                }
             }
         }
         this.portaleAcmehomeRepository.getCouchbaseOperations().update(portale);
@@ -213,7 +227,7 @@ public class PortaleAcmeEatServiceImpl implements PortaleAcmeEatService{
     }
 
     @Override
-    public List<Ristorante> getRistorantiInCitta(String nomeCitta) {
+    public Set<String> getRistorantiInCitta(String nomeCitta) {
         Citta c = this.cittaService.getCittaByName(nomeCitta);
         List<Ristorante> tuttiRistoranti = this.ristoranteService.getAllRistoranti();
         List<String> listaCodiciRistorantiInCitta = new ArrayList<>();
@@ -344,6 +358,7 @@ public class PortaleAcmeEatServiceImpl implements PortaleAcmeEatService{
             this.portaleAcmeEatService.setMenuCorrente(null);
             this.portaleAcmeEatService.setCittaCorrente(null);
             this.portaleAcmeEatService.setDirettoreCorrente(null);
+            this.portaleAcmehomeRepository.delete(this.getPortale());
         } else {
             throw new NotFoundException("Nessun Direttore Loggato Sul Portale");
         }

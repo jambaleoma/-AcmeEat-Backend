@@ -1,5 +1,6 @@
 package it.APS.Eat.Home.demo.controller;
 
+import it.APS.Eat.Home.demo.Exception.NotFoundException;
 import it.APS.Eat.Home.demo.model.*;
 import it.APS.Eat.Home.demo.service.AcmeHome.AcmeHomeService;
 import it.APS.Eat.Home.demo.service.AcmehomePortale.PortaleAcmeEatService;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/rest/portaleAcmeEat")
@@ -71,8 +73,11 @@ public class PortaleAcmeEatController {
     @GetMapping(value = "/logoutDirettore")
     private ResponseEntity logoutDirettore() {
         try {
+            ResponseMessage resp = new ResponseMessage();
+            resp.setResponse(true);
+            resp.setMessage("Uscita effettuata Con Successo");
             portaleAcmeEatService.logoutDirettore();
-            return ResponseEntity.status(HttpStatus.OK).header("Logout Direttore", "--- OK --- Uscita effettuata Con Successo").body("Uscita effettuata Con Successo");
+            return ResponseEntity.status(HttpStatus.OK).header("Logout Direttore", "--- OK --- Uscita effettuata Con Successo").body(resp);
         } catch (Exception e) {
             throw e;
         }
@@ -89,6 +94,19 @@ public class PortaleAcmeEatController {
         }
     }
 
+    @CrossOrigin
+    @PostMapping(value = "/registraDirettore")
+    private ResponseEntity registraDirettore(@RequestBody Direttore direttore) {
+        ResponseMessage resp = new ResponseMessage();
+        try {
+            resp.setResponse(direttoreService.aggiungiDirettore(direttore));
+            resp.setMessage("Direttore Inserito Con Successo");
+            return ResponseEntity.status(HttpStatus.OK).header("Inserimento Direttore", "--- OK --- Direttore Inserito Con Successo").body(resp);
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
     // Caso D'Uso UC1
 
     @CrossOrigin
@@ -96,14 +114,23 @@ public class PortaleAcmeEatController {
     private ResponseEntity loginDirettore(@RequestBody Direttore direttore) {
         try {
             Direttore direttore1oggato = this.portaleAcmeEatService.loginDirettore(direttore);
+            ResponseMessage resp = new ResponseMessage();
+            resp.setResponse(direttore1oggato);
+            resp.setMessage("Il Direttore con codice: " + direttore1oggato.getCodiceDirettore() + " ha effettuato l'accesso\n\n"
+                    + "Direttore\n" +
+                    "Nome: " + direttore1oggato.getNome() + "\n" +
+                    "Cognome: " + direttore1oggato.getCognome() + "\n" +
+                    "Ristoranti: \n" + (direttore1oggato.getRistoranti() != null ? direttore1oggato.getRistoranti() : "nessun Ristorante"));
             return ResponseEntity.status(HttpStatus.OK).header("Login Direttore", "--- OK --- Direttore Loggato Con Successo")
-                    .body("Il Direttore con codice: " + direttore1oggato.getCodiceDirettore() + " ha effettuato l'accesso\n\n"
-                            + "Direttore\n" +
-                            "Nome: " + direttore1oggato.getNome() + "\n" +
-                            "Cognome: " + direttore1oggato.getCognome() + "\n" +
-                            "Ristoranti: \n" + (direttore1oggato.getRistoranti() != null ? ristorantiToString(direttore1oggato.getRistoranti()) : "nessun Ristorante" )
-                    );
+                    .body(resp);
         } catch (Exception e) {
+            if (e.getClass().equals(NotFoundException.class)) {
+                ResponseMessage errorResp = new ResponseMessage();
+                errorResp.setResponse(false);
+                errorResp.setMessage("Direttore non Trovato");
+                return ResponseEntity.status(HttpStatus.OK).header("Login Direttore", "--- OK --- Direttore non trovato Successo")
+                        .body(errorResp);
+            }
             throw e;
         }
     }
@@ -135,7 +162,7 @@ public class PortaleAcmeEatController {
     public ResponseEntity aggiungiProdottoNelMenu(@RequestBody Prodotto prodottoDaInserire) {
         try {
             Menu menu = menuService.aggiungiProdottoNelMenu(prodottoDaInserire);
-            return ResponseEntity.status(HttpStatus.OK).header("Inserimento Prodotto: " + prodottoDaInserire.getCodiceProdotto() + " nel Menu " + portaleAcmeEatService.getMenuCorrente().getCodiceMenu(), "--- OK --- Prodotto Inserito Con Successo").body(menu);
+            return ResponseEntity.status(HttpStatus.OK).header("--- OK --- Prodotto Inserito Con Successo").body(menu);
         } catch (Exception e) {
             throw e;
         }
@@ -148,52 +175,87 @@ public class PortaleAcmeEatController {
         Ristorante ristoranteCorrente = this.portaleAcmeEatService.getRistoranteCorrente();
         Menu menuCorrente = this.portaleAcmeEatService.getMenuCorrente();
         try {
+            ResponseMessage resp = new ResponseMessage();
+            resp.setResponse(this.portaleAcmeEatService.getPortale());
+            resp.setMessage("Il Menu con codice: " + menuCorrente.getCodiceMenu() + " Del Ristorante " + ristoranteCorrente.getNome() +" è stato Completato con Successo\n\n"
+                    + "Ristorante {\n\n" +
+                    "Nome: " + ristoranteCorrente.getNome() + "\n" +
+                    "Descrizione: " + ristoranteCorrente.getDescrizione() + "\n" +
+                    "Città: " + cittaCorrente.getNome() + "\n\n" +
+                    "Menu { \n\n" +  menuToString(menuCorrente) + "}\n\n" + "}");
             return ResponseEntity.status(HttpStatus.OK).header("Fine Inserimento Menu", "--- OK --- Hai completato l'insermento del Menu Con Successo")
-                    .body("Il Menu con codice: " + menuCorrente.getCodiceMenu() + " Del Ristorante " + ristoranteCorrente.getNome() +" è stato Completato con Successo\n\n"
-                            + "Ristorante {\n\n" +
-                            "Nome: " + ristoranteCorrente.getNome() + "\n" +
-                            "Descrizione: " + ristoranteCorrente.getDescrizione() + "\n" +
-                            "Città: " + cittaCorrente.getNome() + "\n\n" +
-                            "Menu { \n\n" +  menuToString(menuCorrente) + "}\n\n" + "}"
-                    );
+                    .body(resp);
         } catch (Exception e) {
             throw e;
         }
     }
 
     @CrossOrigin
-    @PutMapping(value = "/selectSpecialProductToMenu/{codiceProdottoSpeciale}")
-    public ResponseEntity selezionaProdottoSpecialeDelMenu(@PathVariable String codiceProdottoSpeciale) {
+    @PutMapping(value = "/selectSpecialProductToMenu/{codiceMenu}/{codiceProdottoSpeciale}")
+    public ResponseEntity selezionaProdottoSpecialeDelMenu(@PathVariable String codiceMenu, @PathVariable String codiceProdottoSpeciale) {
         try {
-            Menu menu = menuService.selezionaProdottoSpecialeDelMenu(codiceProdottoSpeciale);
-            return ResponseEntity.status(HttpStatus.OK).header("Prodotto speciale: " + codiceProdottoSpeciale + " nel Menu: " + portaleAcmeEatService.getMenuCorrente().getCodiceMenu(), "--- OK --- Prodotto speciale Salvato Con Successo").body(menu);
+            Menu menu = menuService.selezionaProdottoSpecialeDelMenu(codiceMenu, codiceProdottoSpeciale);
+            return ResponseEntity.status(HttpStatus.OK).header("--- OK --- Prodotto speciale Salvato Con Successo").body(menu);
         } catch (Exception e) {
             throw e;
         }
     }
 
     @CrossOrigin
-    @PutMapping(value = "/confermaInserimentoRistorante")
-    private ResponseEntity confermaInserimentoRistorante() {
+    @PutMapping(value = "/confermaInserimentoRistorante/{codiceRistorante}")
+    private ResponseEntity confermaInserimentoRistorante(@PathVariable String codiceRistorante) {
         try {
-            Ristorante ristorante = this.portaleAcmeEatService.getRistoranteCorrente();
+            ResponseMessage resp = new ResponseMessage();
+            Ristorante ristorante = this.ristoranteService.getRistoranteByCodice(codiceRistorante);
+            ristorante.setStato("attivo");
+            Ristorante ristoranteAttivo = this.ristoranteService.updateRistorante(ristorante, ristorante.getCodiceRistorante());
             Direttore direttore =  this.direttoreService.confermaInserimentoRistorante(ristorante.getCodiceRistorante(), ristorante.getCodiceDirettore());
             Citta citta = this.cittaService.confermaInserimentoRistorante(ristorante.getCodiceRistorante());
             AcmeHome acmeHome = acmeHomeService.confermaInserimentoRistorante(ristorante.getCodiceRistorante());
+            resp.setResponse(ristoranteAttivo);
+            resp.setMessage("Direttore\n" +
+                    "Nome: " + direttore.getNome() + "\n" +
+                    "Cognome: " + direttore.getCognome() + "\n" +
+                    "Ristoranti:\n " + (direttore.getRistoranti() != null ? (direttore.getRistoranti()) : "nessun Ristorante" ) + "\n" +
 
+                    "Citta\n" +
+                    "Nome: " + citta.getNome() + "\n" +
+                    "Ristoranti:\n " + (citta.getRistoranti() != null ? citta.getRistoranti() : "nessun Ristorante" ) + "\n" +
+
+                    "Azienda\n" +
+                    "Ristoranti:\n " + (acmeHome.getCodiciQuindiciRistorantiRecenti() != null ? acmeHome.getCodiciQuindiciRistorantiRecenti() : "nessun Ristorante" ) + "\n");
             return ResponseEntity.status(HttpStatus.OK).header("Conferma Inserimento Ristorante", "--- OK --- Inserimento Ristorante Eseguito Con Successo")
-                    .body("Direttore\n" +
-                            "Nome: " + direttore.getNome() + "\n" +
-                            "Cognome: " + direttore.getCognome() + "\n" +
-                            "Ristoranti:\n " + (direttore.getRistoranti() != null ? ristorantiToString(direttore.getRistoranti()) : "nessun Ristorante" ) + "\n" +
+                    .body(resp);
+        } catch (Exception e) {
+            throw e;
+        }
+    }
 
-                            "Citta\n" +
-                            "Nome: " + citta.getNome() + "\n" +
-                            "Ristoranti:\n " + (citta.getRistoranti() != null ? ristorantiToString(citta.getRistoranti()) : "nessun Ristorante" ) + "\n" +
+    @CrossOrigin
+    @PutMapping(value = "/disattivaRistorante/{codiceRistorante}")
+    private ResponseEntity disattivaRistorante(@PathVariable String codiceRistorante) {
+        try {
+            ResponseMessage resp = new ResponseMessage();
+            Ristorante ristorante = this.ristoranteService.getRistoranteByCodice(codiceRistorante);
+            ristorante.setStato("disattivato");
+            Ristorante ristoranteDisattivato = this.ristoranteService.updateRistorante(ristorante, ristorante.getCodiceRistorante());
+            Direttore direttore =  this.direttoreService.disattivaRistorante(ristorante.getCodiceRistorante(), ristorante.getCodiceDirettore());
+            Citta citta = this.cittaService.disattivaRistorante(ristorante.getCodiceRistorante());
+            AcmeHome acmeHome = acmeHomeService.disattivaRistorante(ristorante.getCodiceRistorante());
+            resp.setResponse(ristoranteDisattivato);
+            resp.setMessage("Direttore\n" +
+                    "Nome: " + direttore.getNome() + "\n" +
+                    "Cognome: " + direttore.getCognome() + "\n" +
+                    "Ristoranti:\n " + (direttore.getRistoranti() != null ? (direttore.getRistoranti()) : "nessun Ristorante" ) + "\n" +
 
-                            "Azienda\n" +
-                            "Ristoranti:\n " + (acmeHome.getCodiciQuindiciRistorantiRecenti() != null ? codiciRistorantiToString(acmeHome.getCodiciQuindiciRistorantiRecenti()) : "nessun Ristorante" ) + "\n"
-                    );
+                    "Citta\n" +
+                    "Nome: " + citta.getNome() + "\n" +
+                    "Ristoranti:\n " + (citta.getRistoranti() != null ? citta.getRistoranti() : "nessun Ristorante" ) + "\n" +
+
+                    "Azienda\n" +
+                    "Ristoranti:\n " + (acmeHome.getCodiciQuindiciRistorantiRecenti() != null ? acmeHome.getCodiciQuindiciRistorantiRecenti() : "nessun Ristorante" ) + "\n");
+            return ResponseEntity.status(HttpStatus.OK).header("Conferma Disattivazione Ristorante", "--- OK --- Disattivazione Ristorante Eseguita Con Successo")
+                    .body(resp);
         } catch (Exception e) {
             throw e;
         }
@@ -212,7 +274,7 @@ public class PortaleAcmeEatController {
                             "Consumatore\n" +
                             "Nome: " + consumatoreLoggato.getNome() + "\n" +
                             "Cognome: " + consumatoreLoggato.getCognome() + "\n\n" +
-                            "Ultimi 15 Ristoranti: \n" + codiciRistorantiToString(nuoviRistoranti) + "\n"
+                            "Ultimi 15 Ristoranti: \n" + nuoviRistoranti + "\n"
 
                     );
         } catch (Exception e) {
@@ -235,8 +297,8 @@ public class PortaleAcmeEatController {
     @PostMapping(value = "/selezionaCitta/{nomeCitta}")
     public ResponseEntity selezionaCitta(@PathVariable String nomeCitta) {
         try {
-            List<Ristorante> ristoranti = this.portaleAcmeEatService.getRistorantiInCitta(nomeCitta);
-            return ResponseEntity.status(HttpStatus.OK).header("Selezione Citta", "--- OK --- Citta Selezionata Con Successo").body("Ristoranti Presenti a " + nomeCitta + ": \n" + ristorantiToString(ristoranti));
+            Set<String> ristoranti = this.portaleAcmeEatService.getRistorantiInCitta(nomeCitta);
+            return ResponseEntity.status(HttpStatus.OK).header("Selezione Citta", "--- OK --- Citta Selezionata Con Successo").body("Ristoranti Presenti a " + nomeCitta + ": \n" + ristoranti);
         } catch (Exception e) {
             throw e;
         }
@@ -323,29 +385,6 @@ public class PortaleAcmeEatController {
 
 
     // Metodi ToString
-
-    private StringBuilder ristorantiToString(List<Ristorante> ristoranti) {
-        StringBuilder listaRistoranti = new StringBuilder();
-        for (Ristorante r : ristoranti) {
-            String dettaglioRistorante =
-                    (r.getCodiceRistorante() != null ?  " Codice Ristorante: " + r.getCodiceRistorante() : "" ) + "\n" +
-                            " Nome Ristorante: " + r.getNome() + "\n" +
-                            " Descrizone: " + r.getDescrizione() + "\n" +
-                            " codiceCitta: " + r.getCodiceCitta() + "\n" +
-                            " codiceDirettore: " + r.getCodiceDirettore() + "\n" +
-                            " codiceMenu: " + r.getCodiceMenu() + "\n\n";
-            listaRistoranti.append(dettaglioRistorante);
-        }
-        return listaRistoranti;
-    }
-
-    public StringBuilder codiciRistorantiToString(List<String> codiciRistoranti) {
-        List<Ristorante> ristoranti = new ArrayList<>();
-        for (String cr : codiciRistoranti) {
-            ristoranti.add(this.ristoranteService.getRistoranteByCodice(cr));
-        }
-        return ristorantiToString(ristoranti);
-    }
 
     private StringBuilder menuToString(Menu menu) {
         List<Prodotto> prodottiNelMenu = new ArrayList<>();

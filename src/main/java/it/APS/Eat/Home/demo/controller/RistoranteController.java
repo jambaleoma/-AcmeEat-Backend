@@ -1,12 +1,14 @@
 package it.APS.Eat.Home.demo.controller;
 
-import it.APS.Eat.Home.demo.model.Ristorante;
+import it.APS.Eat.Home.demo.Exception.NotFoundException;
+import it.APS.Eat.Home.demo.model.*;
 import it.APS.Eat.Home.demo.service.Ristorante.RistoranteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -39,6 +41,27 @@ public class RistoranteController {
     }
 
     @CrossOrigin
+    @GetMapping(value = "/getRistorantiByCodiceDirettore/{codiceDirettore}")
+    private ResponseEntity getRistorantiByCodiceDirettore(@PathVariable String codiceDirettore) {
+        ResponseMessage response = new ResponseMessage();
+        try {
+            ArrayList<Ristorante> ristoranti = ristoranteService.getRistorantiByCodiceDirettore(codiceDirettore);
+            response.setResponse(ristoranti);
+            response.setMessage("Ristoranti Trovati Con Successo");
+            return ResponseEntity.status(HttpStatus.OK).header("Ristoranti Trovati", "--- OK --- Ristoranti Trovati Con Successo").body(response);
+        } catch (Exception e) {
+            if (e.getClass().equals(NotFoundException.class)) {
+                ResponseMessage errorResp = new ResponseMessage();
+                errorResp.setResponse(false);
+                errorResp.setMessage("Nessun ristorante trovato");
+                return ResponseEntity.status(HttpStatus.OK).header("Ricerca ristorante", "--- OK --- Nessun ristorante trovato")
+                        .body(errorResp);
+            }
+            throw e;
+        }
+    }
+
+    @CrossOrigin
     @PostMapping(value = "/insertRistorante")
     public ResponseEntity aggiungiRistorante(@RequestBody Ristorante d) {
         try {
@@ -65,7 +88,9 @@ public class RistoranteController {
     private ResponseEntity deleteRistoranteByCodice(@PathVariable String codice) {
         try {
             ristoranteService.deleteRistoranteByCodice(codice);
-            return ResponseEntity.status(HttpStatus.OK).header("Eliminazione Ristorante", "--- OK --- Ristorante Eliminato Con Successo").body("Il Ristorante con codice: " + codice + " è stata Eliminato con Successo");
+            ResponseMessage resp = new ResponseMessage();
+            resp.setMessage("Il Ristorante con codice: " + codice + " è stata Eliminato con Successo");
+            return ResponseEntity.status(HttpStatus.OK).header("Eliminazione Ristorante", "--- OK --- Ristorante Eliminato Con Successo").body(resp);
         } catch (Exception e) {
             throw e;
         }

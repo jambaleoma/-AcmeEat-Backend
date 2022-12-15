@@ -4,13 +4,18 @@ import it.APS.Eat.Home.demo.Exception.NotFoundException;
 import it.APS.Eat.Home.demo.model.AcmeHome;
 import it.APS.Eat.Home.demo.model.Citta;
 import it.APS.Eat.Home.demo.model.Ristorante;
+import it.APS.Eat.Home.demo.model.Utilities;
 import it.APS.Eat.Home.demo.repository.CittaRepository;
 import it.APS.Eat.Home.demo.repository.RistoranteRepository;
 import it.APS.Eat.Home.demo.service.AcmeHome.AcmeHomeService;
+import it.APS.Eat.Home.demo.service.Utilities.UtilitiesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Component("CittaService")
 public class CittaServiceImpl implements CittaService {
@@ -23,6 +28,9 @@ public class CittaServiceImpl implements CittaService {
 
     @Autowired
     private RistoranteRepository ristoranteRepository;
+
+    @Autowired
+    private UtilitiesService utilitiesService;
 
     @Override
     public List<Citta> getAllCitta() {
@@ -48,8 +56,14 @@ public class CittaServiceImpl implements CittaService {
         if (this.cittaRepository.existsById(codice)) {
             return cittaRepository.findById(codice).orElse(null);
         } else {
-            throw new NotFoundException("La Citta non Esiste");
+            Utilities utilities = this.utilitiesService.getUtilities();
+            for (Citta c : utilities.getListacitta()) {
+                if (c.getCodice().equals(codice)) {
+                    return c;
+                }
+            }
         }
+        throw new NotFoundException("La Citta non Esiste");
     }
 
     @Override
@@ -97,7 +111,30 @@ public class CittaServiceImpl implements CittaService {
             Ristorante ristorante = ristoranteRepository.findById(codiceRistorante).orElse(null);
             if (this.cittaRepository.existsById(ristorante.getCodiceCitta())) {
                 Citta c = this.cittaRepository.findById(ristorante.getCodiceCitta()).orElse(null);
-                c.getRistoranti().add(ristorante);
+                c.getRistoranti().add(ristorante.getCodiceRistorante());
+                this.updateCitta(c, c.getCodiceCitta());
+                return c;
+            } else {
+                Utilities utilities = this.utilitiesService.getUtilities();
+                for (Citta c : utilities.getListacitta()) {
+                    if (c.getCodice().equals(ristorante.getCodiceCitta())) {
+                        return this.setNewCityFromList(c);
+                    }
+                }
+            }
+        } else {
+            throw new NotFoundException("Il Ristorante non Esiste");
+        }
+        throw new NotFoundException("La Citta non Esiste");
+    }
+
+    @Override
+    public Citta disattivaRistorante(String codiceRistorante) {
+        if (this.ristoranteRepository.existsById(codiceRistorante)) {
+            Ristorante ristorante = ristoranteRepository.findById(codiceRistorante).orElse(null);
+            if (this.cittaRepository.existsById(ristorante.getCodiceCitta())) {
+                Citta c = this.cittaRepository.findById(ristorante.getCodiceCitta()).orElse(null);
+                c.getRistoranti().remove(ristorante.getCodiceRistorante());
                 this.updateCitta(c, c.getCodiceCitta());
                 return c;
             } else {
@@ -106,6 +143,19 @@ public class CittaServiceImpl implements CittaService {
         } else {
             throw new NotFoundException("Il Ristorante non Esiste");
         }
+    }
+
+    private Citta setNewCityFromList(Citta c) {
+        Citta newCity = new Citta();
+        newCity.setNome(c.getNome());
+        newCity.setCodiceCitta(c.getCodice());
+        Set<String> listaCodiciRistorantiInCitta = new HashSet<>();
+        newCity.setRistoranti(listaCodiciRistorantiInCitta);
+        AcmeHome acmeHome = this.acmeHomeService.getAzienda();
+        List<String> codiciCittaRegistrate = acmeHome.getCodiciCitta();
+        codiciCittaRegistrate.add(c.getCodice());
+        this.acmeHomeService.aggiornaAzienda(acmeHome);
+        return this.cittaRepository.save(newCity);
     }
 
 }

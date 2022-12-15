@@ -6,36 +6,18 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.couchbase.core.mapping.Document;
 import org.springframework.data.couchbase.core.mapping.id.GeneratedValue;
 import org.springframework.data.couchbase.core.mapping.id.GenerationStrategy;
-
-import java.util.List;
-
 @Data
 @Document
-public class Ristorante {
+public class ResponseMessage {
 
     @Id
     @GeneratedValue( strategy = GenerationStrategy.UNIQUE)
-    private String codiceRistorante;
+    private String codiceResponse;
 
     @Field
-    private String stato;
+    private Object response;
 
     @Field
-    private String nome;
-
-    @Field
-    private String descrizione;
-
-    @Field
-    private String codiceCitta;
-
-    @Field
-    private String codiceDirettore;
-
-    @Field
-    private String codiceMenu;
-
-    @Field
-    private List<String> codiciOrdinazioni;
+    private String message;
 
 }

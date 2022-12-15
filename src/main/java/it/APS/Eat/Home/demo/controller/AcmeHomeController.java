@@ -85,9 +85,7 @@ public class AcmeHomeController {
         try {
             List<String> ultimi15Ristoranti = acmeHomeService.getUtlimiQuindiciRistorantiInseriti();
             return ResponseEntity.status(HttpStatus.OK).header("Lista dei Direttori", "--- OK --- Lista dei Direttori Trovata Con Successo").body(
-                    "Ultimi 15 Ristoranti Inseriti: \n\n" +
-                            portaleAcmeEatController.codiciRistorantiToString(ultimi15Ristoranti)
-            );
+                    "Ultimi 15 Ristoranti Inseriti: \n\n" + ultimi15Ristoranti);
         } catch (Exception e) {
             throw e;
         }
